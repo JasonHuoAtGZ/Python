@@ -1,9 +1,9 @@
 import numpy as np
 import pandas as pd
-import datetime
+import datetime as dt
 import time
 
-from surprise import SVD
+from surprise import SlopeOne
 from surprise import GridSearch
 from surprise import Dataset
 from surprise import Reader
@@ -18,7 +18,7 @@ rating=rating.rename(columns={'userId':'userID','movieId':'itemID'})
 rating=rating[['userID','itemID','rating']]
 
 # train & test split
-rating_train, rating_test=train_test_split(rating, train_size=0.01, test_size=0.01, random_state=12345)
+rating_train, rating_test=train_test_split(rating, train_size=0.1, test_size=0.01, random_state=12345)
 print("================================================")
 print("Training sample:")
 print(rating_train.describe())
@@ -35,3 +35,22 @@ rating_test2 = Dataset.load_from_df(rating_test[['userID','itemID','rating']], r
 
 trainset = rating_train2.build_full_trainset()
 testset = rating_test2.build_full_trainset().build_testset()
+
+#SlopeOne Model
+count=1
+
+start = dt.datetime.today()
+print("================================================")
+algo = SlopeOne()
+
+algo.train(trainset)
+#print("This is the #" + str(count) + " parameter combination")
+predictions=algo.test(testset)
+
+#print("n_factors="+str(i)+", n_epochs="+str(j)+", lr_all="+str(k)+", reg_all="+str(m))
+accuracy.rmse(predictions, verbose=True)
+accuracy.fcp(predictions, verbose=True)
+accuracy.mae(predictions, verbose=True)
+count=count+1
+end = dt.datetime.today()
+print("Runtime: "+str(end - start))
