@@ -3,7 +3,7 @@ import pandas as pd
 import datetime
 import time
 
-from surprise import KNNWithMeans
+from surprise import KNNWithZScore
 from surprise import GridSearch
 from surprise import Dataset
 from surprise import Reader
@@ -56,7 +56,7 @@ for o in name:
                                    'shrinkage': q
                                    }
 
-                    algo = KNNWithMeans(k=n1, min_k=n2, sim_options=sim_options)
+                    algo = KNNWithZScore(k=n1, min_k=n2, sim_options=sim_options)
 
                     algo.train(trainset)
 
@@ -88,7 +88,7 @@ for o in name:
                                    'user_based': p
                                    }
 
-                    algo = KNNWithMeans(k=n1, min_k=n2, sim_options=sim_options)
+                    algo = KNNWithZScore(k=n1, min_k=n2, sim_options=sim_options)
 
                     algo.train(trainset)
 

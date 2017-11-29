@@ -1,7 +1,6 @@
 import datetime as dt
 import time
 
-
 start = time.clock()
 end = time.clock()
 print(end-start)
