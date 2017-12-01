@@ -8,7 +8,8 @@ from skimage.transform import resize
 
 
 # import my own image
-mypic=io.imread("C:/Users/jason/Pictures/Camera Roll/WIN_20171130_16_55_47_Pro.jpg")
+#mypic=io.imread("C:/Users/jason/Pictures/Camera Roll/WIN_20171130_16_55_47_Pro.jpg")
+mypic=io.imread("C:/Users/jason/Pictures/Amazing Lock Screen/LAUnionStation_EN-US9199909903_1920x1200.jpg")
 
 #io.imshow(mypic)
 #io.show()
@@ -20,17 +21,35 @@ print("1st Dimension: "+'\n'+str(mypic.shape[0]))
 print("2nd Dimension: "+'\n'+str(mypic.shape[1]))
 print("3rd Dimension: "+'\n'+str(mypic.shape[2]))
 
+'''
 nrows, ncols, nchl = mypic.shape
 row, col = np.ogrid[:nrows, :ncols]
 cnt_row, cnt_col = nrows / 2, ncols / 2
 outer_disk_mask = ((row - cnt_row)**2 + (col - cnt_col)**2 >(nrows / 2)**2)
 mypic[outer_disk_mask] = 0
+'''
 
 #io.imshow(mypic)
 #io.show()
 
+# resize picture
+'''
 mypic_resized=resize(mypic, output_shape=[600,600,3])
 io.imshow(mypic_resized)
 io.show()
+'''
 
+io.imshow(mypic[:,:,0])
+io.show()
 
+io.imshow(mypic[:,:,1])
+io.show()
+
+io.imshow(mypic[:,:,2])
+io.show()
+
+io.imshow(mypic)
+io.show()
+
+# save an image
+# skimage.io.imsave

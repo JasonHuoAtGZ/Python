@@ -5,12 +5,14 @@ from keras.layers import Dense
 from keras.layers import Dropout
 from keras.utils import np_utils
 
+
 # fix random seed for reproducibility
 seed = 7
 numpy.random.seed(seed)
 
 # load data
 (X_train, y_train), (X_test, y_test) = mnist.load_data()
+
 
 # flatten 28*28 images to a 784 vector for each image
 num_pixels = X_train.shape[1] * X_train.shape[2]
@@ -36,11 +38,16 @@ def baseline_model():
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
     return model
 
+print("define baseline model")
+
 # build the model
+
 model = baseline_model()
+print("build the model")
 
 # Fit the model
 model.fit(X_train, y_train, validation_data=(X_test, y_test), nb_epoch=10, batch_size=200,verbose=2)
+print("Fit the model")
 
 # Final evaluation of the model
 scores = model.evaluate(X_test, y_test, verbose=0)
