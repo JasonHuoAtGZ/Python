@@ -10,6 +10,10 @@ from keras.optimizers import SGD
 from keras.layers.convolutional import Conv2D
 from keras.layers.convolutional import MaxPooling2D
 from keras.utils import np_utils
+import datetime as dt
+import time
+
+start=dt.datetime.today()
 
 # fix random seed for reproducibility
 seed = 7
@@ -67,3 +71,6 @@ model.fit(X_train, y_train, validation_data=(X_test, y_test), nb_epoch=epochs,ba
 scores = model.evaluate(X_test, y_test, verbose=0)
 print("Accuracy: %.2f%%" % (scores[1]*100))
 
+end=dt.datetime.today()
+print("Program Runtime:")
+print(end-start)
