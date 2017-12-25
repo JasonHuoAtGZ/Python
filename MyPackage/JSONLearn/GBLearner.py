@@ -310,3 +310,16 @@ class GBLearner:
     def _validating_out(self, df_to_valid):
 
     def _score(self, df_to_score, str_ID):
+        if df_to_score is None:
+            print("No scoring file is specified !!!")
+            return
+        elif len(df_to_score)==0:
+            print("No records found from scoring file !!!")
+            return
+        elif:
+            df_ID=pd.DataFrame(df_to_score[str_ID])
+            to_score1=df_to_score.drop([str_ID], axis=1)
+            to_score2=pd.DataFrame(self.best_model.predict_proba(to_score1.values))
+            df_scored=pd.concat([df_ID, to_score2], axis=1)
+            df_scored=df_scored.rename(columns={0:'score_0', 1:'score_1'})
+            return df_scored
