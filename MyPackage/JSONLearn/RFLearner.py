@@ -6,34 +6,62 @@
 
 import pandas as pd
 import numpy as np
-from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.tree import DecisionTreeClassifier
 
-class MyGBC(GradientBoostingClassifier):
+class MyRFC(RandomForestClassifier):
 
-    def __init__(self, loss='deviance', learning_rate=0.1, n_estimators=100,
-                 subsample=1.0, criterion='friedman_mse', min_samples_split=2,
-                 min_samples_leaf=1, min_weight_fraction_leaf=0.,
-                 max_depth=3, min_impurity_decrease=0.,
-                 min_impurity_split=None, init=None,
-                 random_state=None, max_features=None, verbose=0,
-                 max_leaf_nodes=None, warm_start=False, presort='auto',
-                 df_in=None, str_group=None, str_score=None, str_resp=None
+    def __init__(self,
+                 n_estimators=10,
+                 criterion="gini",
+                 max_depth=None,
+                 min_samples_split=2,
+                 min_samples_leaf=1,
+                 min_weight_fraction_leaf=0.,
+                 max_features="auto",
+                 max_leaf_nodes=None,
+                 min_impurity_decrease=0.,
+                 min_impurity_split=None,
+                 bootstrap=True,
+                 oob_score=False,
+                 n_jobs=1,
+                 random_state=None,
+                 verbose=0,
+                 warm_start=False,
+                 class_weight=None,
+                 df_in = None,
+                 str_group = None,
+                 str_score = None,
+                 str_resp = None
                  ):
 
-        super(GradientBoostingClassifier, self).__init__(
-            loss=loss, learning_rate=learning_rate, n_estimators=n_estimators,
-            criterion=criterion, min_samples_split=min_samples_split,
-            min_samples_leaf=min_samples_leaf,
-            min_weight_fraction_leaf=min_weight_fraction_leaf,
-            max_depth=max_depth, init=init, subsample=subsample,
-            max_features=max_features,
-            random_state=random_state, verbose=verbose,
-            max_leaf_nodes=max_leaf_nodes,
-            # min_impurity_decrease=min_impurity_decrease,
-            min_impurity_split=min_impurity_split,
+        super(RandomForestClassifier, self).__init__(
+            base_estimator=DecisionTreeClassifier(),
+            n_estimators=n_estimators,
+            estimator_params=("criterion", "max_depth", "min_samples_split",
+                              "min_samples_leaf", "min_weight_fraction_leaf",
+                              "max_features", "max_leaf_nodes",
+                              "min_impurity_decrease", "min_impurity_split",
+                              "random_state"),
+            bootstrap=bootstrap,
+            oob_score=oob_score,
+            n_jobs=n_jobs,
+            random_state=random_state,
+            verbose=verbose,
             warm_start=warm_start,
-            presort=presort)
+            class_weight=class_weight)
 
+        self.criterion = criterion
+        self.max_depth = max_depth
+        self.min_samples_split = min_samples_split
+        self.min_samples_leaf = min_samples_leaf
+        self.min_weight_fraction_leaf = min_weight_fraction_leaf
+        self.max_features = max_features
+        self.max_leaf_nodes = max_leaf_nodes
+        self.min_impurity_decrease = min_impurity_decrease
+        self.min_impurity_split = min_impurity_split
+
+        # additional initial variables added
         self.str_score='score_1'
         self.str_resp=str_resp
         self.str_group='group'
@@ -128,24 +156,23 @@ class MyGBC(GradientBoostingClassifier):
         cstat=self.c_stat(df_scored)
 
         param=pd.concat([
-            pd.DataFrame(['Gradient Boosting'], columns=['model_type']),
+            pd.DataFrame(['Random Forest'], columns=['model_type']),
             pd.DataFrame([self.n_estimators], columns=['n_estimators']),
-            pd.DataFrame([self.learning_rate], columns=['learning_rate']),
             pd.DataFrame([self.min_samples_split], columns=['min_samples_split']),
             pd.DataFrame([self.min_samples_leaf], columns=['min_samples_leaf']),
             pd.DataFrame([self.max_depth], columns=['max_depth']),
             pd.DataFrame([self.max_features], columns=['max_features']),
-            pd.DataFrame([self.subsample], columns=['subsample']),
             pd.DataFrame([self.random_state], columns=['random_state']),
             pd.DataFrame([self.criterion], columns=['criterion']),
+            pd.DataFrame([self.bootstrap], columns=['bootstrap']),
+            pd.DataFrame([self.n_jobs], columns=['n_jobs']),
             cstat,
             maxks,
             deciles], axis=1)
 
         return param
 
-
-class GBLearner:
+class RFLearner:
     def __init__(self, mode=None, df_train=None, df_valid=None, str_resp=None):
         self.df_train=df_train
         self.mode=mode
@@ -160,65 +187,65 @@ class GBLearner:
 
         # to grid search all parameters and return the full set of parameters and KPIs
         if self.mode is None or self.mode=='default':
-            self.n_estimators=[70]
-            self.learning_rate=[0.1]
-            self.min_samples_split=[50]
-            self.min_samples_leaf=[25]
-            self.max_depth=[3]
-            self.max_features=['sqrt']
-            self.subsample=[0.9]
-            self.random_state=[10]
-            self.criterion=['friedman_mse'] # mae, mse
+            self.n_estimators=[]
+            self.learning_rate=[]
+            self.min_samples_split=[]
+            self.min_samples_leaf=[]
+            self.max_depth=[]
+            self.max_features=[]
+            self.subsample=[]
+            self.random_state=[]
+            self.criterion=[]
         elif self.mode=='superfast':
-            self.n_estimators=[70]
-            self.learning_rate=[0.1]
-            self.min_samples_split=[50, 100]
-            self.min_samples_leaf=[25, 50]
-            self.max_depth=[3, 4, 5, 6]
-            self.max_features=['sqrt']
-            self.subsample=[0.9]
-            self.random_state=[10]
-            self.criterion=['friedman_mse'] # mae, mse
+            self.n_estimators=[]
+            self.learning_rate=[]
+            self.min_samples_split=[]
+            self.min_samples_leaf=[]
+            self.max_depth=[]
+            self.max_features=[]
+            self.subsample=[]
+            self.random_state=[]
+            self.criterion=[]
         elif self.mode=='fast':
-            self.n_estimators=[70, 80, 90]
-            self.learning_rate=[0.1, 0.2]
-            self.min_samples_split=[50, 100, 200]
-            self.min_samples_leaf=[25, 50, 100]
-            self.max_depth=[3, 4, 5, 6]
-            self.max_features=['sqrt']
-            self.subsample=[0.9]
-            self.random_state=[10]
-            self.criterion=['friedman_mse'] # mae, mse
+            self.n_estimators=[]
+            self.learning_rate=[]
+            self.min_samples_split=[]
+            self.min_samples_leaf=[]
+            self.max_depth=[]
+            self.max_features=[]
+            self.subsample=[]
+            self.random_state=[]
+            self.criterion=[]
         elif self.mode=='medium':
-            self.n_estimators=[70, 80, 90]
-            self.learning_rate=[0.1, 0.2, 0.3]
-            self.min_samples_split=[50, 100, 200, 500]
-            self.min_samples_leaf=[25, 50, 100, 250]
-            self.max_depth=[3, 4, 5, 6, 7, 8]
-            self.max_features=['sqrt']
-            self.subsample=[0.9]
-            self.random_state=[10]
-            self.criterion=['friedman_mse'] # mae, mse
+            self.n_estimators=[]
+            self.learning_rate=[]
+            self.min_samples_split=[]
+            self.min_samples_leaf=[]
+            self.max_depth=[]
+            self.max_features=[]
+            self.subsample=[]
+            self.random_state=[]
+            self.criterion=[]
         elif self.mode=='slow':
-            self.n_estimators=[50, 60, 70, 80, 90, 100]
-            self.learning_rate=[0.1, 0.2, 0.3, 0.4, 0.5]
-            self.min_samples_split=[50, 100, 200, 500, 1000]
-            self.min_samples_leaf=[25, 50, 100, 250, 500]
-            self.max_depth=[3, 4, 5, 6, 7, 8, 9, 10]
-            self.max_features=['sqrt']
-            self.subsample=[0.8, 0.9]
-            self.random_state=[10]
-            self.criterion=['friedman_mse'] # mae, mse
+            self.n_estimators=[]
+            self.learning_rate=[]
+            self.min_samples_split=[]
+            self.min_samples_leaf=[]
+            self.max_depth=[]
+            self.max_features=[]
+            self.subsample=[]
+            self.random_state=[]
+            self.criterion=[]
         elif self.mode=='superslow':
-            self.n_estimators=[50, 60, 70, 80, 90, 100]
-            self.learning_rate=[0.0001, 0.001, 0.01, 0.1, 0.2, 0.3, 0.4, 0.5]
-            self.min_samples_split=[50, 100, 200, 500, 1000]
-            self.min_samples_leaf=[25, 50, 100, 250, 500]
-            self.max_depth=[3, 4, 5, 6, 7, 8, 9, 10]
-            self.max_features=['sqrt']
-            self.subsample=[0.7, 0.8, 0.9]
-            self.random_state=[10]
-            self.criterion=['friedman_mse'] # mae, mse
+            self.n_estimators=[]
+            self.learning_rate=[]
+            self.min_samples_split=[]
+            self.min_samples_leaf=[]
+            self.max_depth=[]
+            self.max_features=[]
+            self.subsample=[]
+            self.random_state=[]
+            self.criterion=[]
 
         if self.df_train is None:
             print("Training Sample is missing !")
@@ -241,25 +268,25 @@ class GBLearner:
 
         # grid search on given parameter mode
         for i in self.n_estimators:
-            for j in self.learning_rate:
-                for k in self.min_samples_split:
-                    for l in self.min_samples_leaf:
-                        for m in self.max_depth:
-                            for n in self.max_features:
-                                for o in self.subsample:
-                                    for p in self.random_state:
-                                        for q in self.criterion:
+            for j in self.min_samples_split:
+                for k in self.min_samples_leaf:
+                    for l in self.max_depth:
+                        for m in self.max_features:
+                            for n in self.random_state:
+                                for o in self.criterion:
+                                    for p in self.bootstrap:
+                                        for q in self.n_jobs:
                                             # model training
-                                            clf=MyGBC(
+                                            clf=MyRFC(
                                                 n_estimators       =i,
-                                                learning_rate      =j,
-                                                min_samples_split  =k,
-                                                min_samples_leaf   =l,
-                                                max_depth          =m,
-                                                max_features       =n,
-                                                subsample          =o,
-                                                random_state       =p,
-                                                criterion          =q,
+                                                min_samples_split  =j,
+                                                min_samples_leaf   =k,
+                                                max_depth          =l,
+                                                max_features       =m,
+                                                random_state       =n,
+                                                criterion          =o,
+                                                bootstrap          =p,
+                                                n_jobs             =q,
                                                 str_resp           =self.str_resp
                                             ).fit(x_train, y_train)
 
@@ -269,7 +296,7 @@ class GBLearner:
                                             p_valid=pd.concat([p_predict, p_actual], axis=1)
                                             p_valid.rename(columns={0:'score_0',1:'score_1'}, inplace=True)
 
-                                            p_rank=pd.DataFrame(pd.qcut(p_valid['score_1'], 10, labels=False)) #, duplicates='drop'
+                                            p_rank=pd.DataFrame(pd.qcut(p_valid['score_1'], 10, labels=False, duplicates='drop'))
                                             p_rank.rename(columns={'score_1':'group'}, inplace=True)
                                             p_valid2=pd.concat([p_valid, p_rank], axis=1)
 
@@ -285,14 +312,14 @@ class GBLearner:
         # save the best model
         self.best_model=MyGBC(
             n_estimators=self.best_param['n_estimators'].values[0],
-            learning_rate=self.best_param['learning_rate'].values[0],
             min_samples_split=self.best_param['min_samples_split'].values[0],
             min_samples_leaf=self.best_param['min_samples_leaf'].values[0],
             max_depth=self.best_param['max_depth'].values[0],
             max_features=self.best_param['max_features'].values[0],
-            subsample=self.best_param['subsample'].values[0],
             random_state=self.best_param['random_state'].values[0],
             criterion=self.best_param['criterion'].values[0],
+            bootstrap=self.best_param['bootstrap'].values[0],
+            n_jobs=self.best_param['n_jobs'].values[0],
             str_resp=self.str_resp
         )
 
