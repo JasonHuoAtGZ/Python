@@ -305,8 +305,31 @@ class GBLearner:
         return
 
     def _validating(self, df_to_valid):
+        # output validation results
+        x_valid=df_to_valid.drop(self.str_resp, axis=1).values
 
+        p_predict=pd.DataFrame(self.best_model.predict_prob(x_valid))
+        p_actual=pd.DataFrame(df_to_valid[self.str_resp])
+        p_valid=pd.concat([p_predict, p_actual], axis=1)
+        p_valid.rename(columns={0:'score_0', 1:'score_1'}, inplace=True)
+        p_rank=pd.DataFrame(pd.qcut(p_valid['score_1'], 10, labels=False))
+        p_rank.rename(columns={'score_1':'group'}, inplace=True)
+        p_valid2=pd.concat([p_valid, p_rank], axis=1)
+
+        return p_valid2
 
     def _validating_out(self, df_to_valid):
+        # output validation sample
+        x_valid=df_to_valid.drop(self.str_resp, axis=1).values
+
+        p_predict=pd.DataFrame(self.best_model.predict_prob(x_valid))
+        p_actual=pd.DataFrame(df_to_valid[self.str_resp])
+        p_valid=pd.concat([p_predict, p_actual], axis=1)
+        p_valid.rename(columns={0:'score_0', 1:'score_1'}, inplace=True)
+        p_rank=pd.DataFrame(pd.qcut(p_valid['score_1'], 10, labels=False))
+        p_rank.rename(columns={'score_1':'group'}, inplace=True)
+        p_valid2=pd.concat([p_valid, p_rank], axis=1)
+
+        return p_valid2
 
     def _score(self, df_to_score, str_ID):
