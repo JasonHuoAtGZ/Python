@@ -332,4 +332,6 @@ class GBLearner:
 
         return p_valid2
 
+    """
     def _score(self, df_to_score, str_ID):
+    """

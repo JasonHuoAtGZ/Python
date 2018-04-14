@@ -1,3 +1,8 @@
+#disable GPU
+import os
+os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID" # see issue #152
+os.environ['CUDA_VISIBLE_DEVICES'] = '-1' # -1 !!!!
+
 # Simple CNN model for CIFAR-10
 import numpy
 from keras.datasets import cifar10
