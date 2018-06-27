@@ -6,7 +6,7 @@ end = time.clock()
 print(end-start)
 
 start=dt.datetime.today()
-time.sleep(10)
+time.sleep(100)
 end=dt.datetime.today()
 
 print(end-start)
