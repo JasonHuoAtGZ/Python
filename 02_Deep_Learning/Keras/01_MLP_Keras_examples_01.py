@@ -8,7 +8,7 @@ seed = 7
 np.random.seed(seed)
 
 # load pima indians dataset
-dataset = np.loadtxt("D:/01_Download/data/pima-indians-diabetes.txt", delimiter=",")
+dataset = np.loadtxt("C:/Users/jason/Working_Folder/01_Download/03_Data/diabetes.csv", delimiter=",")
 # split into input (X) and output (Y) variables
 X = dataset[:,0:8]
 Y = dataset[:,8]
