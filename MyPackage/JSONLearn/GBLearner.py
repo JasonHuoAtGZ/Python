@@ -1,8 +1,10 @@
-# Gradient Boosting Learner
-# this module inherits sklearn.ensemble.GradientBoostingClassifier by incorporating C-stat, Maximum KS & decile lift
-# which are the most important statistics to validate model prediction for campaign targeting / order ranking
-# Developed by Jason Huo
-# Email: jason_huo1983@hotmail.com
+"""Gradient Boosting Learner
+this module inherits sklearn.ensemble.GradientBoostingClassifier by incorporating C-stat, Maximum KS & decile lift
+which are the most important statistics to validate model prediction for campaign targeting / order ranking
+Developed by Jason Huo
+Email: jason_huo1983@hotmail.com
+"""
+
 
 import pandas as pd
 import numpy as np
@@ -14,39 +16,40 @@ class MyGBC(GradientBoostingClassifier):
                  subsample=1.0, criterion='friedman_mse', min_samples_split=2,
                  min_samples_leaf=1, min_weight_fraction_leaf=0.,
                  max_depth=3, min_impurity_decrease=0.,
-                 min_impurity_split=None, init=None,
                  random_state=None, max_features=None, verbose=0,
                  max_leaf_nodes=None, warm_start=False, presort='auto',
                  df_in=None, str_group=None, str_score=None, str_resp=None
                  ):
 
         super(GradientBoostingClassifier, self).__init__(
-            loss=loss, learning_rate=learning_rate, n_estimators=n_estimators,
-            criterion=criterion, min_samples_split=min_samples_split,
-            min_samples_leaf=min_samples_leaf,
-            min_weight_fraction_leaf=min_weight_fraction_leaf,
-            max_depth=max_depth, init=init, subsample=subsample,
-            max_features=max_features,
-            random_state=random_state, verbose=verbose,
-            max_leaf_nodes=max_leaf_nodes,
-            min_impurity_decrease=min_impurity_decrease,
-            min_impurity_split=min_impurity_split,
-            warm_start=warm_start,
-            presort=presort)
-
+                                                        loss=loss, learning_rate=learning_rate, n_estimators=n_estimators,
+                                                        criterion=criterion, min_samples_split=min_samples_split,
+                                                        min_samples_leaf=min_samples_leaf,
+                                                        min_weight_fraction_leaf=min_weight_fraction_leaf,
+                                                        max_depth=max_depth, init=init, subsample=subsample,
+                                                        max_features=max_features,
+                                                        random_state=random_state, verbose=verbose,
+                                                        max_leaf_nodes=max_leaf_nodes,
+                                                        min_impurity_split=min_impurity_split,
+                                                        warm_start=warm_start,
+                                                        presort=presort)
+         """
+        self.df_in=df_in
+        """
         self.str_score='score_1'
         self.str_resp=str_resp
         self.str_group='group'
 
     def decile_lift(self, df_scored):
+
         # df_in: a dataframe that contains both group & response columns
         # str_group: a string that specifies grouping name
         # str_resp: a string that specifies response name
 
         if df_scored is None:
             print("Error: no scored file for decile_lift() !!!!")
-            return
         else:
+
             # group by decile
             deciles=df_scored.groupby([self.str_group]).agg({self.str_resp: [np.size, np.mean]})
             deciles.columns=deciles.columns.droplevel(level=0)
@@ -56,7 +59,6 @@ class MyGBC(GradientBoostingClassifier):
             deciles[self.str_group]=pd_group
             deciles['temp_lift']='decile_lift_'
             deciles['temp_count']='decile_count_'
-
             deciles['decile_lift']=deciles.temp_lift.str.cat(deciles[self.str_group].astype(str))
             deciles['decile_group']=deciles.temp_count.str.cat(deciles[self.str_group].astype(str))
             deciles=deciles.T
@@ -76,12 +78,13 @@ class MyGBC(GradientBoostingClassifier):
             return deciles
 
     def maximum_ks(self, df_scored):
+
         # df_in: a dataframe that contains both group & response columns
         # str_group: a string that specifies grouping name
         # str_resp: a string that specifies response name
+
         if df_scored is None:
             print("Error: no scored file for maximum_ks() !!!!")
-            return
         else:
             # calculate Maximum KS
             max_ks_sort=df_scored.sort_values([self.str_score], ascending=1)
