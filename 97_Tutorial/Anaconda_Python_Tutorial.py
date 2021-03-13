@@ -4,12 +4,13 @@
 multiple line of comments
 """
 
-"""
-==================================================================
-=============================Indexing=============================
-=============================20210312=============================
-==================================================================
-"""
+print("""\
+    ==================================================================
+    =============================Indexing=============================
+    =============================20210312=============================
+    ==================================================================
+    """
+      )
 
 # this is the first comment
 spam = 1  # and this is the second comment
@@ -202,6 +203,7 @@ def fib(n):
         print('b after = ', b)
     print()
 
+
 fib(3)
 
 print("-----------------------")
@@ -212,7 +214,7 @@ print(b)
 print("-----------------------")
 # a, b = b, a + b
 a = b
-b = a+b
+b = a + b
 print(a)
 print(b)
 
@@ -269,20 +271,23 @@ def f2(a, L=None):
 
 print(f2(2))
 
-
 print("-----------------------")
+
 
 # arguments may be passed by position or keyword
 def standard_arg(arg):
     print(arg)
 
+
 # only use positional parameters
 def pos_only_arg(arg, /):
     print(arg)
 
+
 # only allows keyword arguments
 def kwd_only_arg(*, arg):
     print(arg)
+
 
 # all three calling conventions in the same function definition
 def combined_example(pos_only, /, standard, *, kwd_only):
@@ -302,27 +307,27 @@ print(list(range(*args)))
 
 print("-----------------------")
 print("# Lambda Expressions")
-add = lambda x,y:x+y
-print(add(3,4))
-print((lambda x,y:x+y)(5,6))
+add = lambda x, y: x + y
+print(add(3, 4))
+print((lambda x, y: x + y)(5, 6))
 
-my_list = [3,5,-4,-1,0,-2,-6]
+my_list = [3, 5, -4, -1, 0, -2, -6]
 print(sorted(my_list, key=lambda x: abs(x)))
 
-print(list(map(lambda x:x*x,range(1,21))))
-print(list(filter(lambda x:x%2 == 0,range(1,21))))
-
+print(list(map(lambda x: x * x, range(1, 21))))
+print(list(filter(lambda x: x % 2 == 0, range(1, 21))))
 
 from functools import reduce
-print(reduce(lambda x,y:x+y,range(1,101)))
+
+print(reduce(lambda x, y: x + y, range(1, 101)))
 
 
 def add(n):
     return lambda x: x + n
 
+
 add2 = add(5)
 print(add2(15))
-
 
 # more on list
 print("-----------------------")
@@ -341,24 +346,153 @@ print(fruits.pop())
 print(fruits.pop())
 print(fruits)
 
-
 print("-----------------------")
 print("List Comprehensions")
 squares = []
 for x in range(10):
-    squares.append(x**2)
+    squares.append(x ** 2)
 
 print(squares)
-print(list(map(lambda x: x**2, range(10))))
-print([x**2 for x in range(10)])
-print([(x, y) for x in [1,2,3] for y in [3,1,4] if x != y])
-
+print(list(map(lambda x: x ** 2, range(10))))
+print([x ** 2 for x in range(10)])
+print([(x, y) for x in [1, 2, 3] for y in [3, 1, 4] if x != y])
 
 vec = [-4, -2, 0, 2, 4]
-print([x*2 for x in vec])
+print([x * 2 for x in vec])
 print([x for x in vec if x >= 0])
 print([abs(x) for x in vec])
 
 freshfruit = ['  banana', '  loganberry ', 'passion fruit  ']
 print([weapon.strip() for weapon in freshfruit])
+
+print("""\
+    ==================================================================
+    =============================Indexing=============================
+    =============================20210313=============================
+    ==================================================================
+    """
+      )
+
+# sequence data types
+# list -> mutable
+t = [12345, 54321, 'hello!']
+print(t)
+t[0] = 100
+print(t)
+
+# tuple -> immutable but can include mutable objects
+t = (12345, 54321, 'hello!')
+print(t)
+# t[0]=100 -> TypeError: 'tuple' object does not support item assignment
+
+v = ([1, 2, 3], [3, 2, 1])
+print(v)
+v[0][0] = 100
+print(v)
+
+# set
+basket = {'apple', 'orange', 'apple', 'pear', 'orange', 'banana'}
+print(basket)
+print('orange' in basket)
+# Demonstrate set operations on unique letters from two words
+a = set('abracadabra')
+b = set('alacazam')
+print(a)
+print(b)
+print(a - b)
+print(a | b)
+print(a & b)
+print(a ^ b)
+
+c = set(['abc', 'bcd'])
+d = set(['abc', 'edf'])
+print(c)
+print(d)
+print(c - d)
+print(c | d)
+print(c & d)
+print(c ^ d)
+
+print("-----------------------")
+print("Unlike sequences, which are indexed by a range of numbers, dictionaries"
+      " are indexed by keys, which can be any immutable type")
+
+tel = {'jack': 4098, 'sape': 4139}
+tel['guido'] = 4127
+print(tel)
+print(list(tel))
+print(sorted(tel))
+tel2 = sorted(tel)
+print(tel2)
+
+print("The dict() constructor builds dictionaries directly from sequences of key-value pairs:")
+print(dict([('sape', 4139), ('guido', 4127), ('jack', 4098)]))
+
+print("In addition, dict comprehensions can be used to create dictionaries from arbitrary key and value expressions:")
+print({x: x ** 2 for x in (2, 4, 6)})
+
+print("When looping through dictionaries, the key and corresponding value can be retrieved at the same time using the"
+      " items() method")
+knights = {'gallahad': 'the pure', 'robin': 'the brave'}
+for k, v in knights.items():
+    print(k, v)
+
+print("When looping through a sequence, the position index and corresponding value can be retrieved at the same time "
+      "using the enumerate() function")
+for i, v in enumerate(['tic', 'tac', 'toe']):
+    print(i, v)
+
+print("To loop over two or more sequences at the same time, the entries can be paired with the zip() function")
+questions = ['name', 'quest', 'favorite color']
+answers = ['lancelot', 'the holy grail', 'blue']
+for q, a in zip(questions, answers):
+    print('What is your {0}?  It is {1}.'.format(q, a))
+
+print("To loop over a sequence in sorted order, use the sorted() function which returns a new sorted list while "
+      "leaving the source unaltered")
+basket = ['apple', 'orange', 'apple', 'pear', 'orange', 'banana']
+for i in sorted(basket):
+    print(i)
+
+print("Using set() on a sequence eliminates duplicate elements")
+basket = ['apple', 'orange', 'apple', 'pear', 'orange', 'banana']
+for f in sorted(set(basket)):
+    print(f)
+
+print("-----------------------")
+print("Standard Modules")
+import sys
+
+sys.path.append("C:/Users/jason/PycharmProjects/Python/MyPackage")
+for i in sys.path:
+    print(i)
+
+print("-----------------------")
+print("Packages")
+print("Here’s a possible structure for your package")
+print("""\
+sound/                          Top-level package
+      __init__.py               Initialize the sound package
+      formats/                  Subpackage for file format conversions
+              __init__.py
+              wavread.py
+              wavwrite.py
+              aiffread.py
+              aiffwrite.py
+              auread.py
+              auwrite.py
+              ...
+      effects/                  Subpackage for sound effects
+              __init__.py
+              echo.py
+              surround.py
+              reverse.py
+              ...
+      filters/                  Subpackage for filters
+              __init__.py
+              equalizer.py
+              vocoder.py
+              karaoke.py
+              ...
+""")
 
