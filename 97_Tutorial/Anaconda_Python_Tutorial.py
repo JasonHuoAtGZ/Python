@@ -4,6 +4,8 @@
 multiple line of comments
 """
 
+
+
 print("""\
     ==================================================================
     =============================Indexing=============================
@@ -496,3 +498,57 @@ sound/                          Top-level package
               ...
 """)
 
+print("""\
+    ==================================================================
+    =============================Indexing=============================
+    =============================20210317=============================
+    ==================================================================
+    """
+      )
+
+import pandas as pd
+
+print("reading file")
+with open('C:/Users/jason/Working_Folder/03_Python/testing.txt') as f:
+    # read_data = f.read()
+    # read_data_l1 = f.readline()
+    # read_data_l2 = f.readline()
+    for line in f:
+        print(line, end='')
+
+# print(read_data)
+# print(read_data_l1)
+# print(read_data_l2)
+
+print()
+print(f.closed)
+
+
+print("-----------------------")
+print("Working With JSON Data in Python")
+print("https://realpython.com/python-json/")
+import json
+
+
+print("""\
+The process of encoding JSON is usually called serialization. 
+This term refers to the transformation of data into a series of 
+bytes (hence serial) to be stored or transmitted across a network. 
+You may also hear the term marshaling, but that’s a whole other discussion. 
+Naturally, deserialization is the reciprocal process of decoding data 
+that has been stored or delivered in the JSON standard.
+""")
+
+
+print("""\
+Simple Python objects are translated to JSON according to a fairly intuitive conversion.
+
+Python	                JSON
+dict	                object
+list,tuple	            array
+str	                    string
+int, long, float	    number
+True	                true
+False	                false
+None	                null
+""")
