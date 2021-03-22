@@ -4,8 +4,6 @@
 multiple line of comments
 """
 
-
-
 print("""\
     ==================================================================
     =============================Indexing=============================
@@ -523,12 +521,10 @@ with open('C:/Users/jason/Working_Folder/03_Python/testing.txt') as f:
 print()
 print(f.closed)
 
-
 print("-----------------------")
 print("Working With JSON Data in Python")
 print("https://realpython.com/python-json/")
 import json
-
 
 print("""\
 The process of encoding JSON is usually called serialization. 
@@ -538,7 +534,6 @@ You may also hear the term marshaling, but that’s a whole other discussion.
 Naturally, deserialization is the reciprocal process of decoding data 
 that has been stored or delivered in the JSON standard.
 """)
-
 
 print("""\
 Simple Python objects are translated to JSON according to a fairly intuitive conversion.
@@ -553,4 +548,177 @@ False	                false
 None	                null
 """)
 
-print()
+data = {
+    "president": {
+        "name": "Zaphod Beeblebrox",
+        "species": "Betelgeusian"
+    }
+}
+
+with open("C:/Users/jason/Working_Folder/03_Python/data_file.json", "w") as write_file:
+    json.dump(data, write_file)
+
+print(json.dumps(data))
+print(json.dumps(data, indent=4))
+
+import requests
+
+response = requests.get("https://jsonplaceholder.typicode.com/todos")
+todos = json.loads(response.text)
+
+print(todos == response.json())
+print(type(todos))
+print(todos[:10])
+
+# Map of userId to number of complete TODOs for that user
+todos_by_user = {}
+
+# Increment complete TODOs count for each user.
+for todo in todos:
+    if todo["completed"]:
+        try:
+            # Increment the existing user's count.
+            todos_by_user[todo["userId"]] += 1
+        except KeyError:
+            # This user has not been seen. Set their count to 1.
+            todos_by_user[todo["userId"]] = 1
+
+print(todos_by_user)
+
+# Create a sorted list of (userId, num_complete) pairs.
+top_users = sorted(todos_by_user.items(),
+                   key=lambda x: x[1], reverse=True)
+
+print(top_users)
+
+# Get the maximum number of complete TODOs.
+max_complete = top_users[0][1]
+print(max_complete)
+
+# Create a list of all users who have completed
+# the maximum number of TODOs.
+users = []
+for user, num_complete in top_users:
+    if num_complete < max_complete:
+        break
+    users.append(str(user))
+
+max_users = " and ".join(users)
+
+print(max_users)
+
+print("""\
+    ==================================================================
+    =============================Indexing=============================
+    =============================20210318=============================
+    ==================================================================
+    """
+      )
+
+print("Errors and Exceptions")
+
+try_cnt = 4
+
+"""
+while try_cnt > 0:
+    try:
+        x = int(input("Please enter a number: "))
+        print("The number you enter is", x)
+        break
+    except ValueError:
+        if try_cnt - 1 > 0:
+            try_cnt = try_cnt - 1
+            print("Oops!  That was no valid number.  Try again...", try_cnt, " attempt(s) left")
+        else:
+            print("Game Over !")
+            break
+"""
+
+print("""\
+    ==================================================================
+    =============================Indexing=============================
+    =============================20210322=============================
+    ==================================================================
+    """
+      )
+
+print("Python Scopes and Namespaces")
+print("""/
+At any time during execution, there are 3 or 4 nested scopes whose namespaces are directly accessible:
+
+the innermost scope, which is searched first, contains the local names
+
+the scopes of any enclosing functions, which are searched starting with the nearest enclosing scope, contains non-local, but also non-global names
+
+the next-to-last scope contains the current module’s global names
+
+the outermost scope (searched last) is the namespace containing built-in names
+""")
+
+print("A special quirk of Python is that – if no global or nonlocal statement is in effect – "
+      "assignments to names always go into the innermost scope.")
+
+
+def scope_test():
+    def do_local():
+        spam = "local spam"
+
+    def do_nonlocal():
+        nonlocal spam
+        spam = "nonlocal spam"
+
+    def do_global():
+        global spam
+        spam = "global spam"
+
+    spam = "test spam"
+    do_local()
+    print("After local assignment:", spam)
+    do_nonlocal()
+    print("After nonlocal assignment:", spam)
+    do_global()
+    print("After global assignment:", spam)
+
+
+scope_test()
+print("In global scope:", spam)
+
+
+class MyClass:
+    """class instantiation automatically invokes"""
+    def __init__(self):
+        self.data = []
+
+    """A simple example class"""
+    i = 12345
+
+    def f(self):
+        return 'hello world'
+
+
+MC_ob_1 = MyClass()
+
+print(MC_ob_1.i)
+print(MC_ob_1.f())
+
+
+class Complex:
+    def __init__(self, realpart, imagpart):
+        self.r = realpart
+        self.i = imagpart
+
+
+x = Complex(3.0, -4.5)
+
+print(x.r)
+print(x.i)
+
+
+print("Data attributes need not be declared; like local variables, "
+      "they spring into existence when they are first assigned to")
+x.counter = 1
+while x.counter < 10:
+    x.counter = x.counter * 2
+print(x.counter)
+del x.counter
+
