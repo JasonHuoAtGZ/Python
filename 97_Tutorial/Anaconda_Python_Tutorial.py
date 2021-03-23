@@ -699,7 +699,7 @@ class MyClass:
 MC_ob_1 = MyClass()
 
 print(MC_ob_1.i)
-print(MC_ob_1.f())
+print(MC_ob_1.f)
 
 
 class Complex:
@@ -722,3 +722,53 @@ while x.counter < 10:
 print(x.counter)
 del x.counter
 
+
+print("Inheritance")
+
+
+class Person:
+    def __init__(self, fname, lname):
+        self.firstname = fname
+        self.lastname = lname
+
+    def printname(self):
+        print(self.firstname, self.lastname)
+
+
+# Use the Person class to create an object, and then execute the printname method:
+x = Person("John", "Doe")
+x.printname()
+
+
+class Student(Person):
+    pass
+
+
+s1 = Student("Jason", "Huo")
+s1.printname()
+
+"""
+# Create a class named Student, which will inherit the properties and methods from the Person class:
+class Student(Person):
+    # To keep the inheritance of the parent's __init__() function, add a call to the parent's __init__() function
+    # When you add the __init__() function, the child class will no longer inherit the parent's __init__() function
+    # Python also has a super() function that will make the child class inherit all the methods and properties from
+    # its parent
+    def __init__(self, fname, lname):
+        # Person.__init__(self, fname, lname)
+        super().__init__(fname, lname)
+
+
+x = Student("Mike", "Olsen")
+x.printname()
+"""
+
+import os
+
+for p in dir(os):
+    print(p)
+
+from timeit import Timer
+print(Timer('t=a; a=b; b=t', 'a=1; b=2').timeit())
+print(Timer('a,b = b,a', 'a=1; b=2').timeit()
+      )
