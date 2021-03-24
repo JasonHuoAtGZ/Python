@@ -121,8 +121,89 @@ for col in df_char.columns:
 
 print(df_sum)
 """
+
 from MyPackage.DataExplore import data_explore_num
 from MyPackage.DataExplore import data_explore_char
 
+from sklearn.preprocessing import OneHotEncoder
+from sklearn import preprocessing
+from sklearn.compose import ColumnTransformer
+
 data_explore_num(df_bank_base)
 data_explore_char(df_bank_base)
+
+"""
+# Label Encoder
+# 1. INSTANTIATE
+# encode labels with value between 0 and n_classes-1.
+le = preprocessing.LabelEncoder()
+
+# 2. FIT AND TRANSFORM
+# use df.apply() to apply le.fit_transform to all columns
+df_char2 = df_char.apply(le.fit_transform)
+print("==========================================")
+print(df_char.head(10))
+print("==========================================")
+print(df_char2.head(10))
+print("==========================================")
+
+# One-Hot encoder
+# 1. INSTANTIATE
+enc = preprocessing.OneHotEncoder()
+
+# 2. FIT
+enc.fit(df_char)
+
+# 3. Transform
+onehotlabels = pd.DataFrame(enc.transform(df_char).toarray())
+print(onehotlabels.shape)
+print(onehotlabels.head(10))
+
+
+df_temp = pd.DataFrame(df_char['job'].value_counts())
+col_name = df_temp.columns[0]
+dist_char_val = df_temp.index
+dist_char_val_cnt = df_temp.shape[0]
+
+print(col_name)
+print(dist_char_val)
+print(dist_char_val_cnt)
+
+df_char_new = pd.DataFrame()
+
+for i in range(dist_char_val_cnt-1):
+    df_char_new[col_name+'_'+str(i)] = np.where(df_char[col_name] == dist_char_val[i], 1, 0)
+
+print(df_char.head(10))
+print(df_char_new.head(10))
+
+
+"""
+
+from MyPackage.DataExplore import my_onehot_encoder
+from MyPackage.DataExplore import missing_imputation
+from MyPackage.DataExplore import data_preparation
+
+"""
+df_char = df_bank_base.select_dtypes(include=[object])
+
+df1 = pd.DataFrame(df_bank_base[['job', 'marital']])
+df1_new = my_onehot_encoder(df1)
+
+print(df1.head(10))
+print(df1_new.head(10))
+
+df2 = pd.DataFrame(df_bank_base[['age', 'duration']])
+print(df2.head(10))
+
+df3 = missing_imputation(df2)
+
+print(df3.head(10))
+"""
+
+df_bank_base2 = data_preparation(df_bank_base)
+
+print(df_bank_base.head(10))
+print(df_bank_base.shape)
+print(df_bank_base2.head(10))
+print(df_bank_base2.shape)
