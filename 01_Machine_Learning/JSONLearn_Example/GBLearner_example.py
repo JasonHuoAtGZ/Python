@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
-import datetime as dt
-from MyPackage.JSONLearn.GBLearner import GBLearner as GBL
+
 # from sklearn.model_selection import train_test_split
 
 df_raw=pd.read_csv("C:/Users/jason/Python/data/default_of_credit_card_clients.csv")
