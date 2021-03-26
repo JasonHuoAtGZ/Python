@@ -9,58 +9,141 @@ import pandas as pd
 import numpy as np
 from sklearn.ensemble import GradientBoostingClassifier
 
-
 class MyGBC(GradientBoostingClassifier):
-    def __init__(self, *, loss='deviance', learning_rate=0.1, n_estimators=100,
+
+    def __init__(self, loss='deviance', learning_rate=0.1, n_estimators=100,
                  subsample=1.0, criterion='friedman_mse', min_samples_split=2,
                  min_samples_leaf=1, min_weight_fraction_leaf=0.,
                  max_depth=3, min_impurity_decrease=0.,
-                 min_impurity_split=None, init=None,
                  random_state=None, max_features=None, verbose=0,
-                 max_leaf_nodes=None, warm_start=False,
-                 validation_fraction=0.1, n_iter_no_change=None, tol=1e-4,
-                 ccp_alpha=0.0, str_output='score_1', str_resp, str_group):
+                 max_leaf_nodes=None, warm_start=False, presort='auto',
+                 df_in=None, str_group=None, str_score=None, str_resp=None
+                 ):
 
-        super().__init__(
-            loss=loss, learning_rate=learning_rate, n_estimators=n_estimators,
-            criterion=criterion, min_samples_split=min_samples_split,
-            min_samples_leaf=min_samples_leaf,
-            min_weight_fraction_leaf=min_weight_fraction_leaf,
-            max_depth=max_depth, init=init, subsample=subsample,
-            max_features=max_features,
-            random_state=random_state, verbose=verbose,
-            max_leaf_nodes=max_leaf_nodes,
-            min_impurity_decrease=min_impurity_decrease,
-            min_impurity_split=min_impurity_split,
-            warm_start=warm_start, validation_fraction=validation_fraction,
-            n_iter_no_change=n_iter_no_change, tol=tol, ccp_alpha=ccp_alpha)
+        super(GradientBoostingClassifier, self).__init__(
+                                                        loss=loss, learning_rate=learning_rate, n_estimators=n_estimators,
+                                                        criterion=criterion, min_samples_split=min_samples_split,
+                                                        min_samples_leaf=min_samples_leaf,
+                                                        min_weight_fraction_leaf=min_weight_fraction_leaf,
+                                                        max_depth=max_depth, init=init, subsample=subsample,
+                                                        max_features=max_features,
+                                                        random_state=random_state, verbose=verbose,
+                                                        max_leaf_nodes=max_leaf_nodes,
+                                                        min_impurity_split=min_impurity_split,
+                                                        warm_start=warm_start,
+                                                        presort=presort)
+         """
+        self.df_in=df_in
+        """
+        self.str_score='score_1'
+        self.str_resp=str_resp
+        self.str_group='group'
 
-        self.str_output = str_output
-        self.str_resp = str_resp
-        self.str_group = str_group
+    def decile_lift(self, df_scored):
 
-"""
+        # df_in: a dataframe that contains both group & response columns
+        # str_group: a string that specifies grouping name
+        # str_resp: a string that specifies response name
 
-def get_result(self, df_scored):
-    deciles=self.decile_lift(df_scored)
-    maxks=self.maximum_ks(df_scored)
-    cstat=self.c_stat(df_scored)
+        if df_scored is None:
+            print("Error: no scored file for decile_lift() !!!!")
+        else:
 
-    param=pd.concat([
-        pd.DataFrame([self.n_estimators], columns=['n_estimators']),
-        pd.DataFrame([self.learning_rate], columns=['learning_rate']),
-        pd.DataFrame([self.min_samples_split], columns=['min_samples_split']),
-        pd.DataFrame([self.min_samples_leaf], columns=['min_samples_leaf']),
-        pd.DataFrame([self.max_depth], columns=['max_depth']),
-        pd.DataFrame([self.max_features], columns=['max_features']),
-        pd.DataFrame([self.subsample], columns=['subsample']),
-        pd.DataFrame([self.random_state], columns=['random_state']),
-        pd.DataFrame([self.criterion], columns=['criterion']),
-        cstat,
-        maxks,
-        deciles], axis=1)
+            # group by decile
+            deciles=df_scored.groupby([self.str_group]).agg({self.str_resp: [np.size, np.mean]})
+            deciles.columns=deciles.columns.droplevel(level=0)
+            deciles['lift']=deciles['mean']/df_scored[self.str_resp].mean()
+            pd_group=pd.DataFrame(deciles.index)
+            deciles=deciles.reset_index(drop=True)
+            deciles[self.str_group]=pd_group
+            deciles['temp_lift']='decile_lift_'
+            deciles['temp_count']='decile_count_'
+            deciles['decile_lift']=deciles.temp_lift.str.cat(deciles[self.str_group].astype(str))
+            deciles['decile_group']=deciles.temp_count.str.cat(deciles[self.str_group].astype(str))
+            deciles=deciles.T
 
-    return param
+            # get decile count
+            count_part=deciles[deciles.index=='size']
+            count_part.columns=deciles.loc['decile_count']
+            count_part_1=count_part.reset_index(drop=True)
+
+            # get decile lift
+            lift_part=deciles[deciles.index=='lift']
+            lift_part.columns=deciles.loc['decile_lift']
+            lift_part_1=lift_part.reset_index(drop=True)
+
+            deciles=pd.concat([count_part_1, lift_part_1], axis=1)
+
+            return deciles
+
+    def maximum_ks(self, df_scored):
+
+        # df_in: a dataframe that contains both group & response columns
+        # str_group: a string that specifies grouping name
+        # str_resp: a string that specifies response name
+
+        if df_scored is None:
+            print("Error: no scored file for maximum_ks() !!!!")
+        else:
+            # calculate Maximum KS
+            max_ks_sort=df_scored.sort_values([self.str_score], ascending=1)
+            max_ks_sort['good']=max_ks_sort[self.str_resp]
+            max_ks_sort['bad']=1-max_ks_sort[self.str_resp]
+            max_ks_sort['t_resp1']=max_ks_sort.good.cumsum()
+            max_ks_sort['t_resp0']=max_ks_sort.bad.cumsum()
+            max_ks_sort['c_resp1']=max_ks_sort.t_resp1/max_ks_sort.good.sum()
+            max_ks_sort['c_resp0']=max_ks_sort.t_resp0/max_ks_sort.bad.sum()
+            max_ks_sort['max_ks']=abs(max_ks_sort.c_resp1-max_ks_sort.c_resp0)
+
+            max_ks_score=max_ks_sort[(max_ks_sort.max_ks==max_ks_sort.max_ks.max())]
+
+            max_ks_score=max_ks_score.rename(columns={self.str_score:'max_ks_score'})
+            max_ks_score=max_ks_score[['max_ks_score','max_ks']]
+            max_ks_score=max_ks_score.reset_index(drop=True)
+
+            return max_ks_score
+
+    def c_stat(self, df_scored):
+        # df_in: a dataframe that contains both group & response columns
+        # str_group: a string that specifies grouping name
+        # str_resp: a string that specifies response name
+        if df_scored is None:
+            print("Error: no scored file for c_stat() !!!!")
+            return
+        else:
+            # C-stat / concordant %
+            c_stat_sort=df_scored.sort_values([self.str_score], ascending=0)
+            c_stat_sort=c_stat_sort.reset_index(drop=True)
+            c_stat_sort['rp']=c_stat_sort.index
+            num_resp=c_stat_sort.response.sum()
+            rp_sum=sum(c_stat_sort.response*c_stat_sort.rp)
+            row_count=c_stat_sort[self.str_resp].count()
+
+            c_stat=1-((rp_sum-0.5*num_resp*(num_resp+1))/(num_resp*(row_count-num_resp)))
+            c_stat_score=pd.DataFrame([c_stat], columns=['c_stat'])
+
+            return c_stat_score
+
+    def get_result(self, df_scored):
+        deciles=self.decile_lift(df_scored)
+        maxks=self.maximum_ks(df_scored)
+        cstat=self.c_stat(df_scored)
+
+        param=pd.concat([
+            pd.DataFrame([self.n_estimators], columns=['n_estimators']),
+            pd.DataFrame([self.learning_rate], columns=['learning_rate']),
+            pd.DataFrame([self.min_samples_split], columns=['min_samples_split']),
+            pd.DataFrame([self.min_samples_leaf], columns=['min_samples_leaf']),
+            pd.DataFrame([self.max_depth], columns=['max_depth']),
+            pd.DataFrame([self.max_features], columns=['max_features']),
+            pd.DataFrame([self.subsample], columns=['subsample']),
+            pd.DataFrame([self.random_state], columns=['random_state']),
+            pd.DataFrame([self.criterion], columns=['criterion']),
+            cstat,
+            maxks,
+            deciles], axis=1)
+
+        return param
 
 
 class GBLearner:
@@ -218,7 +301,7 @@ class GBLearner:
         importance=pd.DataFrame(self.best_model.feature_importances_, columns=['importance'])
         variable=pd.DataFrame(self.df_train.drop(self.str_resp, axis=1).columns, columns=['variable'])
         features=pd.concat([importance, variable], axis=1)
-        self.feature_importances_=features[(features['importance']!=0)].sort_values(by=['importance'],ascending=0) \
+        self.feature_importances_=features[(features['importance']!=0)].sort_values(by=['importance'],ascending=0)\
             .reset_index(drop=True)
 
         return
@@ -250,4 +333,7 @@ class GBLearner:
         p_valid2=pd.concat([p_valid, p_rank], axis=1)
 
         return p_valid2
-"""
+
+    """
+    def _score(self, df_to_score, str_ID):
+    """
