@@ -56,23 +56,8 @@ print(df_train.head(5))
 print(df_valid.head(5))
 # print(df_holdout.head(5))
 
-"""
-from MyPackage.MySkLearn.GBLearner import MyGBC
 
-new_model = MyGBC()
-"""
+from MyPackage.MySkLearn.GBLearner import GBLearner
 
-from MyPackage.MLMeasurement import decile_lift
-from MyPackage.MLMeasurement import maximum_ks
-from MyPackage.MLMeasurement import c_stat
-
-df_scored = pd.read_csv("C:/Users/jason/Working_Folder/03_Python/scored_file.csv")
-
-print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-print(decile_lift(df_scored, str_group='decile', str_resp='response'))
-print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-
-print(maximum_ks(df_scored, str_resp='response', str_score='score'))
-
-print(c_stat(df_scored, str_resp='response', str_score='score'))
-
+new_model = GBLearner(mode='default', df_train=df_train, df_valid=df_valid, str_resp='response')
+new_model._training()

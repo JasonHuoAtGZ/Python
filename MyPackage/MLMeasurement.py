@@ -103,3 +103,25 @@ def c_stat(df_scored, str_resp, str_score):
 
         return c_stat_score
 
+"""
+def get_result(df_scored):
+    deciles = decile_lift(df_scored)
+    maxks = maximum_ks(df_scored)
+    cstat = c_stat(df_scored)
+
+    param=pd.concat([
+        pd.DataFrame([n_estimators], columns=['n_estimators']),
+        pd.DataFrame([learning_rate], columns=['learning_rate']),
+        pd.DataFrame([min_samples_split], columns=['min_samples_split']),
+        pd.DataFrame([min_samples_leaf], columns=['min_samples_leaf']),
+        pd.DataFrame([max_depth], columns=['max_depth']),
+        pd.DataFrame([max_features], columns=['max_features']),
+        pd.DataFrame([subsample], columns=['subsample']),
+        pd.DataFrame([random_state], columns=['random_state']),
+        pd.DataFrame([criterion], columns=['criterion']),
+        cstat,
+        maxks,
+        deciles], axis=1)
+
+    return param
+"""

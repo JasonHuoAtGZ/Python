@@ -67,3 +67,10 @@ def data_explore_char(df_in):
     return df_smy_cnt
 
 
+def display_string_with_quote(token):
+    try:
+        if int(token) or float(token):
+            return token
+
+    except ValueError:
+        return "'"+str(token)+"'"
