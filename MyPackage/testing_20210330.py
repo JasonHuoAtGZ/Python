@@ -169,13 +169,27 @@ str_hyper_param = ''
 # create combination of all parameters
 hyper_param_combination = itertools.product(*list)
 
+
+
 # create the parameters list for direct model fit
 combination_count = 0
 for p in hyper_param_combination:
+    print(p)
+    hyper_param_single = dict(zip(hyper_param.keys(), p))
+    print(hyper_param_single)
+
+
+
+
+
+"""
     str_hyper_param = ''
     df_temp = pd.DataFrame()
     for i, item in enumerate(hyper_param.keys()):
         str_hyper_param = str_hyper_param + str(item) + ' = ' + str(display_string_with_quote(p[i])) + ' ,'
+
+
+
 
         df_temp = pd.concat([df_temp, pd.DataFrame([p[i]], columns=[item])], axis=1)
 
@@ -188,47 +202,4 @@ for p in hyper_param_combination:
     str_hyper_param = str_hyper_param.rstrip(str_hyper_param[-1])
     print(str_hyper_param)
     print(df_temp)
-
-
-    # put all parameters and KPIs in a row in dataframe
-    """
-
-
-    df_param = pd.DataFrame()
-    for item in hyper_param.keys():
-        # df_param = pd.concat([df_param, ], axis=1)
-        df_temp = pd.DataFrame([], columns=)
-    """
-
-"""
-def get_result(self, df_scored):
-
-    deciles = decile_lift(df_scored)
-    maxks = maximum_ks(df_scored)
-    cstat = c_stat(df_scored)
-
-    df_param = pd.DataFrame()
-
-    for item in ls_param:
-        param = pd.concat([param,
-
-
-                           ], axis=1)
-
-    param=pd.concat([
-        pd.DataFrame([self.n_estimators], columns=['n_estimators']),
-        pd.DataFrame([self.learning_rate], columns=['learning_rate']),
-        pd.DataFrame([self.min_samples_split], columns=['min_samples_split']),
-        pd.DataFrame([self.min_samples_leaf], columns=['min_samples_leaf']),
-        pd.DataFrame([self.max_depth], columns=['max_depth']),
-        pd.DataFrame([self.max_features], columns=['max_features']),
-        pd.DataFrame([self.subsample], columns=['subsample']),
-        pd.DataFrame([self.random_state], columns=['random_state']),
-        pd.DataFrame([self.criterion], columns=['criterion']),
-        cstat,
-        maxks,
-        deciles], axis=1)
-
-    return param
-
 """

@@ -44,20 +44,32 @@ print("""\
       )
 
 df_base = pd.read_csv("C:/Users/jason/Working_Folder/03_Python/bank-full.csv", sep=";", header=0)
+df_to_score = pd.read_csv("C:/Users/jason/Working_Folder/03_Python/bank_to_score.csv", sep=";", header=0)
 
 df_base['response'] = np.where(df_base['y'] == "yes", 1, 0)
 df_base = df_base.drop(['y'], axis=1)
+df_to_score = df_to_score.drop(['y'], axis=1)
 
 df_base2 = data_preparation(df_base)
+df_to_score = data_preparation(df_to_score, df_base)
 
 df_train, df_valid = my_dataframe_split(df_base2, frac_train=0.5, frac_valid=0.5, random_state=1)
 
 print(df_train.head(5))
 print(df_valid.head(5))
-# print(df_holdout.head(5))
+print(df_to_score.head(5))
 
 
 from MyPackage.MySkLearn.GBLearner import GBLearner
 
-new_model = GBLearner(mode='default', df_train=df_train, df_valid=df_valid, str_resp='response')
+new_model = GBLearner(mode='superfast', df_train=df_train, df_valid=df_valid, str_resp='response')
 new_model._training()
+
+print(new_model.best_param)
+print(new_model.top_variable)
+
+
+
+
+
+

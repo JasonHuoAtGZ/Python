@@ -5,9 +5,13 @@ import pandas as pd
 import numpy as np
 
 
-def my_onehot_encoder(df_in):
+def my_onehot_encoder(df_in, df_train=None):
 
-    df_char = pd.DataFrame(df_in.select_dtypes(include=[object]))
+    if df_train is None:
+        df_char = pd.DataFrame(df_in.select_dtypes(include=[object]))
+    else:
+        df_char = pd.DataFrame(df_train.select_dtypes(include=[object]))
+
     df_out = pd.DataFrame()
 
     for col in df_char.columns:
@@ -37,9 +41,9 @@ def missing_imputation(df_in, imput_val=0):
     return df_in
 
 
-def data_preparation(df_in):
+def data_preparation(df_in, df_train=None):
     df_num_imputed = missing_imputation(df_in)
-    df_char_dummy = my_onehot_encoder(df_in)
+    df_char_dummy = my_onehot_encoder(df_in, df_train)
 
     df_num_imputed['id_temp'] = df_num_imputed.index
     df_char_dummy['id_temp'] = df_char_dummy.index
