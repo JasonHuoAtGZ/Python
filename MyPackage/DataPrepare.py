@@ -8,9 +8,9 @@ import numpy as np
 def my_onehot_encoder(df_in, df_train=None):
 
     if df_train is None:
-        df_char = pd.DataFrame(df_in.select_dtypes(include=[object]))
+        df_char = pd.DataFrame(df_in.select_dtypes(include=object))
     else:
-        df_char = pd.DataFrame(df_train.select_dtypes(include=[object]))
+        df_char = pd.DataFrame(df_train.select_dtypes(include=object))
 
     df_out = pd.DataFrame()
 
@@ -19,14 +19,8 @@ def my_onehot_encoder(df_in, df_train=None):
         dist_char_val = df_temp.index
         dist_char_val_cnt = df_temp.shape[0]
 
-        """
-        print(col)
-        print(dist_char_val)
-        print(dist_char_val_cnt)
-        """
-
         for i in range(dist_char_val_cnt-1):
-            df_out[col+'_'+str(i)] = np.where(df_char[col] == dist_char_val[i], 1, 0)
+            df_out[col+'_'+str(i)] = np.where(df_in[col] == dist_char_val[i], 1, 0)
 
     return df_out
 

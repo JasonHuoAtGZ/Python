@@ -239,3 +239,7 @@ class GBLearner:
         return p_valid2
 
     def scoring_out(self, df_to_score):
+        p_scored = pd.DataFrame(self.best_model.predict_proba(df_to_score.values))
+        p_scored.rename(columns={0: 'score_0', 1: 'score_1'}, inplace=True)
+
+        return p_scored
