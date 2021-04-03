@@ -69,18 +69,26 @@ def my_dataframe_split(df_in, frac_train=0.5, frac_valid=0.5, random_state=1):
         print("Output - training sample dimension: ", df_base_train.shape)
         print("Output - validation sample dimension: ", df_base_valid.shape)
 
+        df_base_train = df_base_train.reset_index(drop=True)
+        df_base_valid = df_base_valid.reset_index(drop=True)
+
         return df_base_train, df_base_valid
 
     else:
         frac_valid_adj = frac_valid/(1-frac_train)
         df_base_train = df_in.sample(frac=frac_train, random_state=random_state)
         df_base_valid = df_in.drop(df_base_train.index).sample(frac=frac_valid_adj, random_state=random_state)
-        df_base_holdout = df_in.drop(df_base_train.index).drop(df_base_valid.index)
+        df_base_holdout = df_in.drop(df_base_train.index)
+        df_base_holdout = df_base_holdout.drop(df_base_valid.index)
 
         print("Input dimension: ", df_in.shape)
         print("Output - training sample dimension: ", df_base_train.shape)
         print("Output - validation sample dimension: ", df_base_valid.shape)
         print("Output - holdout sample dimension: ", df_base_holdout.shape)
+
+        df_base_train = df_base_train.reset_index(drop=True)
+        df_base_valid = df_base_valid.reset_index(drop=True)
+        df_base_holdout = df_base_holdout.reset_index(drop=True)
 
         return df_base_train, df_base_valid, df_base_holdout
 

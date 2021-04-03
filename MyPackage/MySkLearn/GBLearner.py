@@ -115,7 +115,7 @@ class GBLearner:
         if self.str_resp is None:
             print("Response variable is not specified !")
 
-    def _training(self):
+    def training(self):
         # Program start time
         overall_start_time = time.time()
 
@@ -153,11 +153,8 @@ class GBLearner:
             for i, item in enumerate(self.hyper_param.keys()):
                 df_param_temp = pd.concat([df_param_temp, pd.DataFrame([p[i]], columns=[item])], axis=1)
 
-            # model training
-            clf = GradientBoostingClassifier(**hyper_param_single)
-
-            # model fit
-            clf.fit(x_train, y_train)
+            # model training and fit
+            clf = GradientBoostingClassifier(**hyper_param_single).fit(x_train, y_train)
 
             # model validation
             p_predict = pd.DataFrame(clf.predict_proba(x_valid))
@@ -188,57 +185,57 @@ class GBLearner:
         self.best_param = pd.DataFrame(self.best_param.iloc[0])
         self.best_param = self.best_param.T
 
-
         # save the best model
-        # need to revise and remove hard-coding later
-
         best_param_temp = self.best_param[self.hyper_param.keys()]
         best_param_temp2 = best_param_temp.to_dict(orient="index")
 
-        # best_param_temp2 = {'n_estimators': 70, 'learning_rate': 0.1, 'min_samples_split': 50, 'min_samples_leaf': 25, 'max_depth': 3, 'max_features': 'sqrt', 'subsample': 0.9, 'random_state': 10, 'criterion': 'friedman_mse'}
+        self.best_model = GradientBoostingClassifier(**best_param_temp2[0]).fit(x_train, y_train)
+        # revising ...................
+        # df_temp = pd.DataFrame(self.best_model.predict_proba(x_valid))
 
-        clf2 = GradientBoostingClassifier(**best_param_temp2[0]).fit(x_train, y_train)
-
-        # self.best_model = .fit(x_train, y_train)
-
-        """
         # save the variable of importance for the best model
         importance = pd.DataFrame(self.best_model.feature_importances_, columns=['importance'])
         variable = pd.DataFrame(self.df_train.drop(self.str_resp, axis=1).columns, columns=['variable'])
         features = pd.concat([importance, variable], axis=1)
         self.top_variable = features[(features['importance'] != 0)].sort_values(by=['importance'], ascending=0) \
             .reset_index(drop=True)
-        
-        """
 
         print('Overall execution time in seconds: ' + str(time.time() - overall_start_time))
-        return best_param_temp2
+        return
 
-    def _validating(self, df_to_valid):
+    def validating_param(self, df_to_valid):
         # output validation results
-        x_valid=df_to_valid.drop(self.str_resp, axis=1).values
+        y_valid = df_to_valid[self.str_resp].values
+        x_valid = df_to_valid.drop(self.str_resp, axis=1).values
 
-        p_predict=pd.DataFrame(self.best_model.predict_prob(x_valid))
-        p_actual=pd.DataFrame(df_to_valid[self.str_resp])
-        p_valid=pd.concat([p_predict, p_actual], axis=1)
-        p_valid.rename(columns={0:'score_0', 1:'score_1'}, inplace=True)
-        p_rank=pd.DataFrame(pd.qcut(p_valid['score_1'], 10, labels=False))
-        p_rank.rename(columns={'score_1':'group'}, inplace=True)
-        p_valid2=pd.concat([p_valid, p_rank], axis=1)
+        p_predict = pd.DataFrame(self.best_model.predict_proba(x_valid))
+        p_actual = pd.DataFrame(df_to_valid[self.str_resp])
+        p_valid = pd.concat([p_predict, p_actual], axis=1)
+        p_valid.rename(columns={0: 'score_0', 1: 'score_1'}, inplace=True)
+        p_rank = pd.DataFrame(pd.qcut(p_valid['score_1'], 10, labels=False))
+        p_rank.rename(columns={'score_1': 'decile'}, inplace=True)
+        p_valid2 = pd.concat([p_valid, p_rank], axis=1)
 
-        return p_valid2
+        # get parameters and KPIs
+        deciles = decile_lift(p_valid2, 'decile', self.str_score)
+        maxks = maximum_ks(p_valid2, self.str_resp, self.str_score)
+        cstat = c_stat(p_valid2, self.str_resp, self.str_score)
 
-    def _validating_out(self, df_to_valid):
+        df_param = pd.concat([pd.DataFrame(['bestmodel'], columns=['bestmodel']), deciles, maxks, cstat], axis=1)
+        return df_param
+
+    def validating_out(self, df_to_valid):
         # output validation sample
-        x_valid=df_to_valid.drop(self.str_resp, axis=1).values
+        x_valid = df_to_valid.drop(self.str_resp, axis=1).values
 
-        p_predict=pd.DataFrame(self.best_model.predict_prob(x_valid))
-        p_actual=pd.DataFrame(df_to_valid[self.str_resp])
-        p_valid=pd.concat([p_predict, p_actual], axis=1)
-        p_valid.rename(columns={0:'score_0', 1:'score_1'}, inplace=True)
-        p_rank=pd.DataFrame(pd.qcut(p_valid['score_1'], 10, labels=False))
-        p_rank.rename(columns={'score_1':'group'}, inplace=True)
-        p_valid2=pd.concat([p_valid, p_rank], axis=1)
+        p_predict = pd.DataFrame(self.best_model.predict_proba(x_valid))
+        p_actual = pd.DataFrame(df_to_valid[self.str_resp])
+        p_valid = pd.concat([p_predict, p_actual], axis=1)
+        p_valid.rename(columns={0: 'score_0', 1: 'score_1'}, inplace=True)
+        p_rank = pd.DataFrame(pd.qcut(p_valid['score_1'], 10, labels=False))
+        p_rank.rename(columns={'score_1': 'decile'}, inplace=True)
+        p_valid2 = pd.concat([p_valid, p_rank], axis=1)
 
         return p_valid2
 
+    def scoring_out(self, df_to_score):
