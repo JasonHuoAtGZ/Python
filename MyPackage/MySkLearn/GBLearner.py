@@ -156,7 +156,7 @@ class GBLearner:
             # model training
             clf = GradientBoostingClassifier(**hyper_param_single)
 
-            # model training
+            # model fit
             clf.fit(x_train, y_train)
 
             # model validation
@@ -192,19 +192,27 @@ class GBLearner:
         # save the best model
         # need to revise and remove hard-coding later
 
-        best_param_temp = best_param. drop(['estimator', 'mode', ''], axis=1)
+        best_param_temp = self.best_param[self.hyper_param.keys()]
+        best_param_temp2 = best_param_temp.to_dict(orient="index")
 
-        self.best_model = GradientBoostingClassifier(**self.best_param.to_dict(orient="list")).fit(x_train, y_train)
+        # best_param_temp2 = {'n_estimators': 70, 'learning_rate': 0.1, 'min_samples_split': 50, 'min_samples_leaf': 25, 'max_depth': 3, 'max_features': 'sqrt', 'subsample': 0.9, 'random_state': 10, 'criterion': 'friedman_mse'}
 
+        clf2 = GradientBoostingClassifier(**best_param_temp2[0]).fit(x_train, y_train)
+
+        # self.best_model = .fit(x_train, y_train)
+
+        """
         # save the variable of importance for the best model
         importance = pd.DataFrame(self.best_model.feature_importances_, columns=['importance'])
         variable = pd.DataFrame(self.df_train.drop(self.str_resp, axis=1).columns, columns=['variable'])
         features = pd.concat([importance, variable], axis=1)
         self.top_variable = features[(features['importance'] != 0)].sort_values(by=['importance'], ascending=0) \
             .reset_index(drop=True)
+        
+        """
 
         print('Overall execution time in seconds: ' + str(time.time() - overall_start_time))
-        return
+        return best_param_temp2
 
     def _validating(self, df_to_valid):
         # output validation results

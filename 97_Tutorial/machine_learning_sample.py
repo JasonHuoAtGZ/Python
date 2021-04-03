@@ -62,13 +62,11 @@ print(df_to_score.head(5))
 
 from MyPackage.MySkLearn.GBLearner import GBLearner
 
-new_model = GBLearner(mode='superfast', df_train=df_train, df_valid=df_valid, str_resp='response')
-new_model._training()
+new_model = GBLearner(mode='default', df_train=df_train, df_valid=df_valid, str_resp='response')
+best_param_temp = new_model._training()
 
-print(new_model.best_param)
-print(new_model.top_variable)
-
-
+print(new_model.best_param.to_dict(orient="index")[0])
+print(best_param_temp[0])
 
 
 
