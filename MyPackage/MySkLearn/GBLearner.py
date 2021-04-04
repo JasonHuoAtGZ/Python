@@ -119,11 +119,11 @@ class GBLearner:
 
     def estimator_constructor(self, str_estimator, dt_hyper_param):
         if str_estimator == 'GradientBoostingClassifier':
-            return GradientBoostingClassifier(dt_hyper_param)
+            return GradientBoostingClassifier(**dt_hyper_param)
         elif str_estimator == 'RandomForestClassifier':
-            return RandomForestClassifier(dt_hyper_param)
+            return RandomForestClassifier(**dt_hyper_param)
         elif str_estimator == "XGBClassifier":
-            return  XGBClassifier(dt_hyper_param)
+            return  XGBClassifier(**dt_hyper_param)
 
     def training(self):
         # Program start time
@@ -165,7 +165,7 @@ class GBLearner:
 
             # model training and fit
             # clf = GradientBoostingClassifier(**hyper_param_single).fit(x_train, y_train)
-            clf = self.estimator_constructor(self.estimator, **hyper_param_single).fit(x_train, y_train)
+            clf = self.estimator_constructor(self.estimator, hyper_param_single).fit(x_train, y_train)
 
             # model validation
             p_predict = pd.DataFrame(clf.predict_proba(x_valid))
@@ -200,7 +200,7 @@ class GBLearner:
         best_param_temp = self.best_param[self.hyper_param.keys()]
         best_param_temp2 = best_param_temp.to_dict(orient="index")
         # self.best_model = GradientBoostingClassifier(**best_param_temp2[0]).fit(x_train, y_train)
-        self.best_model = self.estimator_constructor(self.estimator, **best_param_temp2[0]).fit(x_train, y_train)
+        self.best_model = self.estimator_constructor(self.estimator, best_param_temp2[0]).fit(x_train, y_train)
 
         # save the variable of importance for the best model
         importance = pd.DataFrame(self.best_model.feature_importances_, columns=['importance'])
