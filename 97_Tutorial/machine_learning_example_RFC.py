@@ -6,12 +6,12 @@ from MyPackage.DataPrepare import my_onehot_encoder
 from MyPackage.DataPrepare import missing_imputation
 from MyPackage.DataPrepare import data_preparation
 from MyPackage.DataPrepare import my_dataframe_split
-from MyPackage.MySkLearn.GBLearner import GBLearner
+from MyPackage.MySkLearn.RFLearner import RFLearner
 
 
 print("""\
     ==================================================================
-    ========================GradientBoosting==========================
+    =========================Random Forest============================
     ==================================================================
     """
       )
@@ -43,33 +43,6 @@ print("scoring sample dimension: ", df_to_score.shape)
 # Step 2: model development and validation
 
 # train model
-new_model = GBLearner(estimator='GradientBoostingClassifier', mode='default', df_train=df_train, df_valid=df_valid, str_resp='response')
-new_model.training()
+new_model = RFLearner(mode='superfast', df_train=df_train, df_valid=df_valid, str_resp='response')
 
-# best model
-print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-print("best model - hyper parameter")
-print(new_model.best_param)
-print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-print("best model - feature importance")
-print(new_model.top_variable)
-# export all parameters
-new_model.param.to_csv("C:/Users/jason/PycharmProjects/Python/MyData/param.csv")
-
-# hold-out sample validation
-print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-print("hold-out sample validation - hyper parameter")
-print(new_model.validating_param(df_holdout))
-
-print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-print("hold-out sample validation - top rows")
-print(new_model.validating_out(df_holdout).head(10))
-
-# >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-# Step 3: model scoring
-
-print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-print("model scoring - top rows")
-print(new_model.scoring_out(df_to_score).head(10))
-
-
+print(new_model.hyper_param)

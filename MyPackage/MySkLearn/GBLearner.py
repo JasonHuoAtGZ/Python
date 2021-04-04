@@ -1,8 +1,8 @@
 """Gradient Boosting Learner
-this module inherits sklearn.ensemble.GradientBoostingClassifier by incorporating C-stat, Maximum KS & decile lift
-which are the most important statistics to validate model prediction for campaign targeting / order ranking
-Developed by Jason Huo
-Email: jason_huo1983@hotmail.com
+- this module inherits sklearn.ensemble.GradientBoostingClassifier by incorporating C-stat, Maximum KS & decile lift
+which are the most important statistics to validate model prediction for campaign targeting / order ranking.
+- developed by Jason Huo
+- email: jason_huo1983@hotmail.com
 """
 
 import pandas as pd
@@ -10,6 +10,8 @@ import numpy as np
 import time
 import itertools
 from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.ensemble import RandomForestClassifier
+from xgboost import XGBClassifier
 from MyPackage.MLMeasurement import decile_lift
 from MyPackage.MLMeasurement import maximum_ks
 from MyPackage.MLMeasurement import c_stat
@@ -17,9 +19,9 @@ from MyPackage.MLMeasurement import c_stat
 
 class GBLearner:
 
-    def __init__(self, mode=None, df_train=None, df_valid=None, str_resp=None):
-        # str_output='score_1', str_score=None
+    def __init__(self, estimator=None, mode=None, df_train=None, df_valid=None, str_resp=None):
 
+        self.estimator = estimator
         self.mode = mode
         self.df_train = df_train.reset_index(drop=True)
         self.df_valid = df_valid.reset_index(drop=True)
@@ -115,6 +117,14 @@ class GBLearner:
         if self.str_resp is None:
             print("Response variable is not specified !")
 
+    def estimator_constructor(self, str_estimator, dt_hyper_param):
+        if str_estimator == 'GradientBoostingClassifier':
+            return GradientBoostingClassifier(dt_hyper_param)
+        elif str_estimator == 'RandomForestClassifier':
+            return RandomForestClassifier(dt_hyper_param)
+        elif str_estimator == "XGBClassifier":
+            return  XGBClassifier(dt_hyper_param)
+
     def training(self):
         # Program start time
         overall_start_time = time.time()
@@ -146,7 +156,7 @@ class GBLearner:
             interation_start_time = time.time() # interation start time
 
             hyper_param_single = dict(zip(self.hyper_param.keys(), p))
-            df_param_temp = pd.DataFrame({'estimator': ['GradientBoostingClassifier'], 'mode': [self.mode]})
+            df_param_temp = pd.DataFrame({'estimator': [self.estimator], 'mode': [self.mode]})
 
             iteration_count = iteration_count + 1
 
@@ -154,7 +164,8 @@ class GBLearner:
                 df_param_temp = pd.concat([df_param_temp, pd.DataFrame([p[i]], columns=[item])], axis=1)
 
             # model training and fit
-            clf = GradientBoostingClassifier(**hyper_param_single).fit(x_train, y_train)
+            # clf = GradientBoostingClassifier(**hyper_param_single).fit(x_train, y_train)
+            clf = self.estimator_constructor(self.estimator, **hyper_param_single).fit(x_train, y_train)
 
             # model validation
             p_predict = pd.DataFrame(clf.predict_proba(x_valid))
@@ -188,10 +199,8 @@ class GBLearner:
         # save the best model
         best_param_temp = self.best_param[self.hyper_param.keys()]
         best_param_temp2 = best_param_temp.to_dict(orient="index")
-
-        self.best_model = GradientBoostingClassifier(**best_param_temp2[0]).fit(x_train, y_train)
-        # revising ...................
-        # df_temp = pd.DataFrame(self.best_model.predict_proba(x_valid))
+        # self.best_model = GradientBoostingClassifier(**best_param_temp2[0]).fit(x_train, y_train)
+        self.best_model = self.estimator_constructor(self.estimator, **best_param_temp2[0]).fit(x_train, y_train)
 
         # save the variable of importance for the best model
         importance = pd.DataFrame(self.best_model.feature_importances_, columns=['importance'])
