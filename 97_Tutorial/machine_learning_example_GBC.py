@@ -43,7 +43,7 @@ print("scoring sample dimension: ", df_to_score.shape)
 # Step 2: model development and validation
 
 # train model
-new_model = GBLearner(mode='medium', df_train=df_train, df_valid=df_valid, str_resp='response')
+new_model = GBLearner(mode='superfast', df_train=df_train, df_valid=df_valid, str_resp='response')
 new_model.training()
 
 # best model
