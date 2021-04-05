@@ -10,7 +10,7 @@ import numpy as np
 import time
 import itertools
 from sklearn.ensemble import RandomForestClassifier
-from MyPackage.MySkLearn.GBLearner import GBLearner
+from MyPackage.MySkLearn.MachineLearningClassifier import GBLearner
 import MyPackage.MLMeasurement
 
 

@@ -6,12 +6,12 @@ from MyPackage.DataPrepare import my_onehot_encoder
 from MyPackage.DataPrepare import missing_imputation
 from MyPackage.DataPrepare import data_preparation
 from MyPackage.DataPrepare import my_dataframe_split
-from MyPackage.MySkLearn.GBLearner import GBLearner
+from MyPackage.MySkLearn.MachineLearningClassifier import MLClassifier
 
 
 print("""\
     ==================================================================
-    ========================GradientBoosting==========================
+    ==================Machine Learning Classifier=====================
     ==================================================================
     """
       )
@@ -42,11 +42,12 @@ print("scoring sample dimension: ", df_to_score.shape)
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 # Step 2: model development and validation
 
+# params = {'n_estimators': [30]}
+
 # train model
-new_model = GBLearner(estimator='GradientBoostingClassifier', mode='default', df_train=df_train, df_valid=df_valid, str_resp='response')
+new_model = MLClassifier(estimator='XGBClassifier',  mode='default', df_train=df_train, df_valid=df_valid, str_resp='response')
 
 new_model.training()
-
 
 # best model
 print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
