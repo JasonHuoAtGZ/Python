@@ -6,13 +6,12 @@ Email: jason_huo1983@hotmail.com
 """
 
 import pandas as pd
-import numpy as np
 import itertools
 from sklearn.ensemble import GradientBoostingClassifier
-from MyPackage.MLMeasurement import decile_lift
-from MyPackage.MLMeasurement import maximum_ks
-from MyPackage.MLMeasurement import c_stat
-from MyPackage.DataExplore import display_string_with_quote
+from MyPackage.MyToolKit.MLMeasurement import decile_lift
+from MyPackage.MyToolKit.MLMeasurement import maximum_ks
+from MyPackage.MyToolKit.MLMeasurement import c_stat
+from MyPackage.MyToolKit.DataExplore import display_string_with_quote
 
 
 class GBLearner(GradientBoostingClassifier):
@@ -41,8 +40,8 @@ class GBLearner(GradientBoostingClassifier):
             warm_start=warm_start, validation_fraction=validation_fraction,
             n_iter_no_change=n_iter_no_change, tol=tol, ccp_alpha=ccp_alpha)
 
-        self.mode = mode
         self.df_train = df_train
+        self.mode = mode
         self.df_valid = df_valid
         self.str_resp = str_resp  # response variable
         self.str_score = 'score_1'
@@ -136,11 +135,12 @@ class GBLearner(GradientBoostingClassifier):
         if self.str_resp is None:
             print("Response variable is not specified !")
 
+
     def _training(self):
         # data preparation
         # training sample
-        y_train = self.df_train[self.str_resp].values
-        x_train = self.df_train.drop(self.str_resp, axis=1).values
+        y_train=self.df_train[self.str_resp].values
+        x_train=self.df_train.drop(self.str_resp, axis=1).values
 
         # validation sample
         y_valid = self.df_valid[self.str_resp].values
@@ -159,14 +159,17 @@ class GBLearner(GradientBoostingClassifier):
 
         # create the parameters list for direct model fit
         for p in hyper_param_combination:
-            hyper_param_single = dict(zip(self.hyper_param.keys(), p))
-
+            str_hyper_param = ''
             df_param_temp = pd.DataFrame()
             for i, item in enumerate(self.hyper_param.keys()):
+                str_hyper_param = str_hyper_param + str(item) + ' = ' + str(display_string_with_quote(p[i])) + ' ,'
                 df_param_temp = pd.concat([df_param_temp, pd.DataFrame([p[i]], columns=[item])], axis=1)
 
+            print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+            str_hyper_param = str_hyper_param.rstrip(str_hyper_param[-1])
+            print(str_hyper_param)
             # model training
-            clf = GBLearner(**hyper_param_single)
+            clf = GBLearner(str_hyper_param)
 
             # model training
             clf.fit(x_train, y_train)

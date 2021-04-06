@@ -5,13 +5,7 @@ which are the most important statistics to validate model prediction for campaig
 - email: jason_huo1983@hotmail.com
 """
 
-import pandas as pd
-import numpy as np
-import time
-import itertools
-from sklearn.ensemble import RandomForestClassifier
 from MyPackage.MySkLearn.MachineLearningClassifier import GBLearner
-import MyPackage.MLMeasurement
 
 
 class RFLearner(GBLearner):

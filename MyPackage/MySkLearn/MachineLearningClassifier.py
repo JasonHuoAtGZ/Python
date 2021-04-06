@@ -6,15 +6,14 @@ which are the most important statistics to validate model prediction for campaig
 """
 
 import pandas as pd
-import numpy as np
 import time
 import itertools
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.ensemble import RandomForestClassifier
 from xgboost import XGBClassifier
-from MyPackage.MLMeasurement import decile_lift
-from MyPackage.MLMeasurement import maximum_ks
-from MyPackage.MLMeasurement import c_stat
+from MyPackage.MyToolKit.MLMeasurement import decile_lift
+from MyPackage.MyToolKit.MLMeasurement import maximum_ks
+from MyPackage.MyToolKit.MLMeasurement import c_stat
 
 
 class MLClassifier:

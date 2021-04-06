@@ -1,11 +1,7 @@
 import numpy as np
 import pandas as pd
-from MyPackage.DataExplore import data_explore_char
-from MyPackage.DataExplore import data_explore_num
-from MyPackage.DataPrepare import my_onehot_encoder
-from MyPackage.DataPrepare import missing_imputation
-from MyPackage.DataPrepare import data_preparation
-from MyPackage.DataPrepare import my_dataframe_split
+from MyPackage.MyToolKit.DataPrepare import data_preparation
+from MyPackage.MyToolKit.DataPrepare import my_dataframe_split
 from MyPackage.MySkLearn.MachineLearningClassifier import MLClassifier
 
 

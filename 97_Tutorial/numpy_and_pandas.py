@@ -122,12 +122,8 @@ for col in df_char.columns:
 print(df_sum)
 """
 
-from MyPackage.DataExplore import data_explore_num
-from MyPackage.DataExplore import data_explore_char
-
-from sklearn.preprocessing import OneHotEncoder
-from sklearn import preprocessing
-from sklearn.compose import ColumnTransformer
+from MyPackage.MyToolKit.DataExplore import data_explore_num
+from MyPackage.MyToolKit.DataExplore import data_explore_char
 
 data_explore_num(df_bank_base)
 data_explore_char(df_bank_base)
@@ -180,9 +176,7 @@ print(df_char_new.head(10))
 
 """
 
-from MyPackage.DataExplore import my_onehot_encoder
-from MyPackage.DataExplore import missing_imputation
-from MyPackage.DataExplore import data_preparation
+from MyPackage.MyToolKit.DataExplore import data_preparation
 
 """
 df_char = df_bank_base.select_dtypes(include=[object])
