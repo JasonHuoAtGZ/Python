@@ -20,7 +20,7 @@ from MyPackage.MyToolKit.MLMeasurement import maximum_ks
 from MyPackage.MyToolKit.MLMeasurement import c_stat
 
 
-class MLClassifier:
+class MLRegressor:
 
     def __init__(self, estimator=None, hyper_param_in=None, mode=None, df_train=None, df_valid=None, str_resp=None):
 
