@@ -22,6 +22,8 @@ def my_onehot_encoder(df_in, df_train=None):
         for i in range(dist_char_val_cnt-1):
             df_out[col+'_'+str(i)] = np.where(df_in[col] == dist_char_val[i], 1, 0)
 
+    df_out = df_out.reset_index(drop=True)
+
     return df_out
 
 
@@ -31,6 +33,8 @@ def missing_imputation(df_in, imput_val=0):
 
     for col in df_in.columns:
         df_in[col] = np.where(df_in[col].isnull(), imput_val, df_in[col])
+
+    df_in = df_in.reset_index(drop=True)
 
     return df_in
 
@@ -44,6 +48,8 @@ def data_preparation(df_in, df_train=None):
 
     df_out = pd.merge(df_num_imputed, df_char_dummy, how='outer', on='id_temp')
     df_out = df_out.drop(['id_temp'], axis=1)
+
+    df_out = df_out.reset_index(drop=True)
 
     return df_out
 

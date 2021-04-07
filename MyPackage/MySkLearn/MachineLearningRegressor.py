@@ -16,6 +16,9 @@ from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.ensemble import RandomForestRegressor
 from xgboost import XGBRegressor
 from sklearn.metrics import mean_squared_error
+from sklearn.metrics import explained_variance_score
+from sklearn.metrics import mean_absolute_error
+from sklearn.metrics import mean_absolute_percentage_error
 from MyPackage.MyToolKit.MLMeasurement import decile_lift
 from MyPackage.MyToolKit.MLMeasurement import maximum_ks
 from MyPackage.MyToolKit.MLMeasurement import c_stat
@@ -44,62 +47,74 @@ class MLRegressor:
             if self.mode is None or self.mode == 'default':
                 self.hyper_param = {
                     'n_estimators': [70],
-                    'max_depth': [3],
-                    'subsample': [0.9],
-                    'colsample_bytree': [0.5],  # 0.5 - 1
                     'learning_rate': [0.1],
+                    'min_samples_split': [100],
+                    'min_samples_leaf': [50],
+                    'max_depth': [3],
+                    'max_features': ['sqrt'],
+                    'subsample': [0.9],
                     'random_state': [10],
-                    'booster': ['gbtree']
+                    'criterion': ['friedman_mse']
                 }
             elif self.mode == 'superfast':
                 self.hyper_param = {
                     'n_estimators': [70],
-                    'max_depth': [3, 4, 5, 6],
-                    'subsample': [0.9],
-                    'colsample_bytree': [0.5],  # 0.5 - 1
                     'learning_rate': [0.1],
+                    'min_samples_split': [50, 100],
+                    'min_samples_leaf': [25, 50],
+                    'max_depth': [3, 4, 5, 6],
+                    'max_features': ['sqrt'],
+                    'subsample': [0.9],
                     'random_state': [10],
-                    'booster': ['gbtree']
+                    'criterion': ['friedman_mse']
                 }
             elif self.mode == 'fast':
                 self.hyper_param = {
                     'n_estimators': [70, 80, 90],
-                    'max_depth': [3, 4, 5, 6],
-                    'subsample': [0.9],
-                    'colsample_bytree': [0.5],  # 0.5 - 1
                     'learning_rate': [0.1, 0.2],
+                    'min_samples_split': [50, 100, 200],
+                    'min_samples_leaf': [25, 50, 100],
+                    'max_depth': [3, 4, 5, 6],
+                    'max_features': ['sqrt'],
+                    'subsample': [0.9],
                     'random_state': [10],
-                    'booster': ['gbtree']
+                    'criterion': ['friedman_mse']
                 }
             elif self.mode == 'medium':
                 self.hyper_param = {
                     'n_estimators': [70, 80, 90, 100],
-                    'max_depth': [3, 4, 5, 6, 7, 8],
-                    'subsample': [0.9],
-                    'colsample_bytree': [0.5],  # 0.5 - 1
                     'learning_rate': [0.1, 0.2, 0.3],
+                    'min_samples_split': [50, 100, 200, 500],
+                    'min_samples_leaf': [25, 50, 100, 250],
+                    'max_depth': [3, 4, 5, 6, 7, 8],
+                    'max_features': ['sqrt'],
+                    'subsample': [0.9],
                     'random_state': [10],
-                    'booster': ['gbtree']
+                    'criterion': ['friedman_mse']
                 }
             elif self.mode == 'slow':
                 self.hyper_param = {
                     'n_estimators': [50, 60, 70, 80, 90, 100],
-                    'max_depth': [3, 4, 5, 6, 7, 8, 9, 10],
-                    'subsample': [0.8, 0.9],
-                    'colsample_bytree': [0.5, 0.6, 0.7],  # 0.5 - 1
                     'learning_rate': [0.1, 0.2, 0.3, 0.4, 0.5],
+                    'min_samples_split': [50, 100, 200, 500, 1000],
+                    'min_samples_leaf': [25, 50, 100, 250, 500],
+                    'max_depth': [3, 4, 5, 6, 7, 8, 9, 10],
+                    'max_features': ['sqrt'],
+                    'subsample': [0.8, 0.9],
                     'random_state': [10],
-                    'booster': ['gbtree']
+                    'criterion': ['friedman_mse']
                 }
             elif self.mode == 'superslow':
                 self.hyper_param = {
                     'n_estimators': [50, 60, 70, 80, 90, 100],
-                    'max_depth': [3, 4, 5, 6, 7, 8, 9, 10],
-                    'subsample': [0.7, 0.8, 0.9],
-                    'colsample_bytree': [0.5, 0.6, 0.7, 0.8, 0.9, 1],  # 0.5 - 1
                     'learning_rate': [0.0001, 0.001, 0.01, 0.1, 0.2, 0.3, 0.4, 0.5],
+                    'min_samples_split': [50, 100, 200, 500, 1000],
+                    'min_samples_leaf': [25, 50, 100, 250, 500],
+                    'max_depth': [3, 4, 5, 6, 7, 8, 9, 10],
+                    'max_features': ['sqrt'],
+                    'subsample': [0.7, 0.8, 0.9],
                     'random_state': [10],
-                    'booster': ['gbtree']
+                    'criterion': ['friedman_mse']
                 }
         elif self.estimator == 'RandomForestRegressor': # Random Forest hyper parameters
             if self.mode is None or self.mode == 'default':
@@ -294,22 +309,30 @@ class MLRegressor:
             clf = self.estimator_constructor(self.estimator, hyper_param_single).fit(x_train, y_train)
 
             # model validation
+            """
             p_predict = pd.DataFrame(clf.predict(x_valid))
             p_actual = pd.DataFrame(self.df_valid[self.str_resp])
             p_valid = pd.concat([p_predict, p_actual], axis=1)
+            p_valid.rename(columns={0: 'y_predict', 'target': 'y_target'}, inplace=True)
             """
-            p_valid.rename(columns={0: 'score_0', 1: 'score_1'}, inplace=True)
-
-            p_rank = pd.DataFrame(pd.qcut(p_valid['score_1'], 10, labels=False, duplicates='drop'))
-            p_rank.rename(columns={'score_1': 'decile'}, inplace=True)
-            p_valid2 = pd.concat([p_valid, p_rank], axis=1)
+            # Root mean square error
+            error_rmse = mean_squared_error(self.df_valid[self.str_resp].values, clf.predict(x_valid), squared=False)
+            df_rmse = pd.DataFrame({'RMSE': [error_rmse]})
+            # Mean square error
+            error_mse = mean_squared_error(self.df_valid[self.str_resp].values, clf.predict(x_valid), squared=True)
+            df_mse = pd.DataFrame({'MSE': [error_mse]})
+            # Mean absolute error
+            error_mae = mean_absolute_error(self.df_valid[self.str_resp].values, clf.predict(x_valid))
+            df_mae = pd.DataFrame({'MAE': [error_mae]})
+            # explained variance regression score.
+            error_evs = explained_variance_score(self.df_valid[self.str_resp].values, clf.predict(x_valid))
+            df_evs = pd.DataFrame({'EVS': [error_evs]})
+            # Mean absolute percentage error
+            error_mape = mean_absolute_percentage_error(self.df_valid[self.str_resp].values, clf.predict(x_valid))
+            df_mape = pd.DataFrame({'MAPE': [error_mape]})
 
             # get parameters and KPIs
-            deciles = decile_lift(p_valid2, 'decile', self.str_score)
-            maxks = maximum_ks(p_valid2, self.str_resp, self.str_score)
-            cstat = c_stat(p_valid2, self.str_resp, self.str_score)
-
-            df_param_temp = pd.concat([df_param_temp, deciles, maxks, cstat], axis=1)
+            df_param_temp = pd.concat([df_param_temp, df_mape, df_rmse, df_mse, df_mae, df_evs], axis=1)
 
             self.param = self.param.append(df_param_temp)
 
@@ -319,7 +342,7 @@ class MLRegressor:
             print('Execution time in seconds: ' + str(time.time() - interation_start_time))
 
         # find best parameter, will enhance selection mode to define best parameter
-        self.best_param = self.param[(self.param['c_stat'] == self.param['c_stat'].max())]
+        self.best_param = self.param[(self.param['EVS'] == self.param['EVS'].max())]
         self.best_param = pd.DataFrame(self.best_param.iloc[0])
         self.best_param = self.best_param.T
 
@@ -336,15 +359,15 @@ class MLRegressor:
             .reset_index(drop=True)
 
         print('Overall execution time in seconds: ' + str(time.time() - overall_start_time))
-        
-        """
-        return p_valid
+
+        return
 
     def validating_param(self, df_to_valid):
         # output validation results
         y_valid = df_to_valid[self.str_resp].values
         x_valid = df_to_valid.drop(self.str_resp, axis=1).values
 
+        """
         p_predict = pd.DataFrame(self.best_model.predict(x_valid))
         p_actual = pd.DataFrame(df_to_valid[self.str_resp])
         p_valid = pd.concat([p_predict, p_actual], axis=1)
@@ -352,13 +375,27 @@ class MLRegressor:
         p_rank = pd.DataFrame(pd.qcut(p_valid['score_1'], 10, labels=False))
         p_rank.rename(columns={'score_1': 'decile'}, inplace=True)
         p_valid2 = pd.concat([p_valid, p_rank], axis=1)
+        """
 
         # get parameters and KPIs
-        deciles = decile_lift(p_valid2, 'decile', self.str_score)
-        maxks = maximum_ks(p_valid2, self.str_resp, self.str_score)
-        cstat = c_stat(p_valid2, self.str_resp, self.str_score)
+        # Root mean square error
+        error_rmse = mean_squared_error(df_to_valid[self.str_resp].values, self.best_model.predict(x_valid), squared=False)
+        df_rmse = pd.DataFrame({'RMSE': [error_rmse]})
+        # Mean square error
+        error_mse = mean_squared_error(df_to_valid[self.str_resp].values, self.best_model.predict(x_valid), squared=True)
+        df_mse = pd.DataFrame({'MSE': [error_mse]})
+        # Mean absolute error
+        error_mae = mean_absolute_error(df_to_valid[self.str_resp].values, self.best_model.predict(x_valid))
+        df_mae = pd.DataFrame({'MAE': [error_mae]})
+        # explained variance regression score.
+        error_evs = explained_variance_score(df_to_valid[self.str_resp].values, self.best_model.predict(x_valid))
+        df_evs = pd.DataFrame({'EVS': [error_evs]})
+        # Mean absolute percentage error
+        error_mape = mean_absolute_percentage_error(df_to_valid[self.str_resp].values, self.best_model.predict(x_valid))
+        df_mape = pd.DataFrame({'MAPE': [error_mape]})
 
-        df_param = pd.concat([pd.DataFrame(['bestmodel'], columns=['bestmodel']), deciles, maxks, cstat], axis=1)
+        df_param = pd.concat([pd.DataFrame(['bestmodel'], columns=['bestmodel']), df_mape, df_rmse, df_mse, df_mae, df_evs], axis=1)
+
         return df_param
 
     def validating_out(self, df_to_valid):
@@ -368,15 +405,12 @@ class MLRegressor:
         p_predict = pd.DataFrame(self.best_model.predict(x_valid))
         p_actual = pd.DataFrame(df_to_valid[self.str_resp])
         p_valid = pd.concat([p_predict, p_actual], axis=1)
-        p_valid.rename(columns={0: 'score_0', 1: 'score_1'}, inplace=True)
-        p_rank = pd.DataFrame(pd.qcut(p_valid['score_1'], 10, labels=False))
-        p_rank.rename(columns={'score_1': 'decile'}, inplace=True)
-        p_valid2 = pd.concat([p_valid, p_rank], axis=1)
+        p_valid.rename(columns={0: 'y_predict', 'target': 'y_target'}, inplace=True)
 
-        return p_valid2
+        return p_valid
 
     def scoring_out(self, df_to_score):
         p_scored = pd.DataFrame(self.best_model.predict(df_to_score.values))
-        p_scored.rename(columns={0: 'score_0', 1: 'score_1'}, inplace=True)
+        p_scored.rename(columns={0: 'y_predict'}, inplace=True)
 
         return p_scored
