@@ -46,10 +46,10 @@ class MLRegressor:
         elif self.estimator == 'GradientBoostingRegressor': # Gradient Boosting hyper parameters
             if self.mode is None or self.mode == 'default':
                 self.hyper_param = {
-                    'n_estimators': [70],
+                    'n_estimators': [50, 60, 70, 80, 90, 100, 150, 200],
                     'learning_rate': [0.1],
-                    'min_samples_split': [100],
-                    'min_samples_leaf': [50],
+                    'min_samples_split': [50],
+                    'min_samples_leaf': [25],
                     'max_depth': [3],
                     'max_features': ['sqrt'],
                     'subsample': [0.9],
@@ -58,7 +58,7 @@ class MLRegressor:
                 }
             elif self.mode == 'superfast':
                 self.hyper_param = {
-                    'n_estimators': [70],
+                    'n_estimators': [50, 60, 70, 80, 90, 100, 150, 200, 300, 400, 500],
                     'learning_rate': [0.1],
                     'min_samples_split': [50, 100],
                     'min_samples_leaf': [25, 50],
@@ -70,7 +70,7 @@ class MLRegressor:
                 }
             elif self.mode == 'fast':
                 self.hyper_param = {
-                    'n_estimators': [70, 80, 90],
+                    'n_estimators': [50, 60, 70, 80, 90, 100, 150, 200, 300, 400, 500, 600, 700, 800],
                     'learning_rate': [0.1, 0.2],
                     'min_samples_split': [50, 100, 200],
                     'min_samples_leaf': [25, 50, 100],
@@ -82,7 +82,7 @@ class MLRegressor:
                 }
             elif self.mode == 'medium':
                 self.hyper_param = {
-                    'n_estimators': [70, 80, 90, 100],
+                    'n_estimators': [50, 60, 70, 80, 90, 100, 150, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1500],
                     'learning_rate': [0.1, 0.2, 0.3],
                     'min_samples_split': [50, 100, 200, 500],
                     'min_samples_leaf': [25, 50, 100, 250],
@@ -94,7 +94,7 @@ class MLRegressor:
                 }
             elif self.mode == 'slow':
                 self.hyper_param = {
-                    'n_estimators': [50, 60, 70, 80, 90, 100],
+                    'n_estimators': [50, 60, 70, 80, 90, 100, 150, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1500, 2000, 2500],
                     'learning_rate': [0.1, 0.2, 0.3, 0.4, 0.5],
                     'min_samples_split': [50, 100, 200, 500, 1000],
                     'min_samples_leaf': [25, 50, 100, 250, 500],
@@ -106,7 +106,7 @@ class MLRegressor:
                 }
             elif self.mode == 'superslow':
                 self.hyper_param = {
-                    'n_estimators': [50, 60, 70, 80, 90, 100],
+                    'n_estimators': [50, 60, 70, 80, 90, 100, 150, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000],
                     'learning_rate': [0.0001, 0.001, 0.01, 0.1, 0.2, 0.3, 0.4, 0.5],
                     'min_samples_split': [50, 100, 200, 500, 1000],
                     'min_samples_leaf': [25, 50, 100, 250, 500],
@@ -119,74 +119,74 @@ class MLRegressor:
         elif self.estimator == 'RandomForestRegressor': # Random Forest hyper parameters
             if self.mode is None or self.mode == 'default':
                 self.hyper_param = {
-                    'n_estimators': [70],
+                    'n_estimators': [50, 60, 70, 80, 90, 100, 150, 200],
                     'max_depth': [3],
                     'min_samples_split': [50],
                     'min_samples_leaf': [25],
                     'max_features': ['auto'],
                     'bootstrap': [True],
-                    'criterion': ['gini'],
+                    'criterion': ['mse'],
                     'random_state': [10]
                 }
             elif self.mode == 'superfast':
                 self.hyper_param = {
-                    'n_estimators': [70],
+                    'n_estimators': [50, 60, 70, 80, 90, 100, 150, 200, 300, 400, 500],
                     'max_depth': [3, 4, 5, 6],
                     'min_samples_split': [50, 100],
                     'min_samples_leaf': [25, 50],
                     'max_features': ['auto'],
                     'bootstrap': [True],
-                    'criterion': ['gini'],
+                    'criterion': ['mse'],
                     'random_state': [10]
                 }
             elif self.mode == 'fast':
                 self.hyper_param = {
-                    'n_estimators': [70, 80, 90],
+                    'n_estimators': [50, 60, 70, 80, 90, 100, 150, 200, 300, 400, 500, 600, 700, 800],
                     'max_depth': [3, 4, 5, 6],
                     'min_samples_split': [50, 100, 200],
                     'min_samples_leaf': [25, 50, 100],
                     'max_features': ['auto'],
                     'bootstrap': [True],
-                    'criterion': ['gini'],
+                    'criterion': ['mse'],
                     'random_state': [10]
                 }
             elif self.mode == 'medium':
                 self.hyper_param = {
-                    'n_estimators': [70, 80, 90, 100],
+                    'n_estimators': [50, 60, 70, 80, 90, 100, 150, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1500],
                     'max_depth': [3, 4, 5, 6, 7, 8],
                     'min_samples_split': [50, 100, 200, 500],
                     'min_samples_leaf': [25, 50, 100, 250],
                     'max_features': ['auto'],
                     'bootstrap': [True],
-                    'criterion': ['gini'],
+                    'criterion': ['mse'],
                     'random_state': [10]
                 }
             elif self.mode == 'slow':
                 self.hyper_param = {
-                    'n_estimators': [50, 60, 70, 80, 90, 100],
+                    'n_estimators': [50, 60, 70, 80, 90, 100, 150, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1500, 2000, 2500],
                     'max_depth': [3, 4, 5, 6, 7, 8, 9, 10],
                     'min_samples_split': [50, 100, 200, 500, 1000],
                     'min_samples_leaf': [25, 50, 100, 250, 500],
                     'max_features': ['auto'],
                     'bootstrap': [True],
-                    'criterion': ['gini'],
+                    'criterion': ['mse'],
                     'random_state': [10]
                 }
             elif self.mode == 'superslow':
                 self.hyper_param = {
-                    'n_estimators': [50, 60, 70, 80, 90, 100],
+                    'n_estimators': [50, 60, 70, 80, 90, 100, 150, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000],
                     'max_depth': [3, 4, 5, 6, 7, 8, 9, 10],
                     'min_samples_split': [50, 100, 200, 500, 1000],
                     'min_samples_leaf': [25, 50, 100, 250, 500],
                     'max_features': ['auto'],
                     'bootstrap': [True],
-                    'criterion': ['gini'],
+                    'criterion': ['mse'],
                     'random_state': [10]
                 }
         elif self.estimator == 'XGBRegressor': # Extreme Gradient Boosting hyper parameters
             if self.mode is None or self.mode == 'default':
                 self.hyper_param = {
-                    'n_estimators': [70],
+                    'n_estimators': [50, 60, 70, 80, 90, 100, 150, 200],
                     'max_depth': [3],
                     'subsample': [0.9],
                     'colsample_bytree': [0.5],  # 0.5 - 1
@@ -197,7 +197,7 @@ class MLRegressor:
                 }
             elif self.mode == 'superfast':
                 self.hyper_param = {
-                    'n_estimators': [70],
+                    'n_estimators': [50, 60, 70, 80, 90, 100, 150, 200, 300, 400, 500],
                     'max_depth': [3, 4, 5, 6],
                     'subsample': [0.9],
                     'colsample_bytree': [0.5],  # 0.5 - 1
@@ -208,7 +208,7 @@ class MLRegressor:
                 }
             elif self.mode == 'fast':
                 self.hyper_param = {
-                    'n_estimators': [70, 80, 90],
+                    'n_estimators': [50, 60, 70, 80, 90, 100, 150, 200, 300, 400, 500, 600, 700, 800],
                     'max_depth': [3, 4, 5, 6],
                     'subsample': [0.9],
                     'colsample_bytree': [0.5],  # 0.5 - 1
@@ -219,7 +219,7 @@ class MLRegressor:
                 }
             elif self.mode == 'medium':
                 self.hyper_param = {
-                    'n_estimators': [70, 80, 90, 100],
+                    'n_estimators': [50, 60, 70, 80, 90, 100, 150, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1500],
                     'max_depth': [3, 4, 5, 6, 7, 8],
                     'subsample': [0.9],
                     'colsample_bytree': [0.5],  # 0.5 - 1
@@ -230,7 +230,7 @@ class MLRegressor:
                 }
             elif self.mode == 'slow':
                 self.hyper_param = {
-                    'n_estimators': [50, 60, 70, 80, 90, 100],
+                    'n_estimators': [50, 60, 70, 80, 90, 100, 150, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1500, 2000, 2500],
                     'max_depth': [3, 4, 5, 6, 7, 8, 9, 10],
                     'subsample': [0.8, 0.9],
                     'colsample_bytree': [0.5, 0.6, 0.7],  # 0.5 - 1
@@ -241,7 +241,7 @@ class MLRegressor:
                 }
             elif self.mode == 'superslow':
                 self.hyper_param = {
-                    'n_estimators': [50, 60, 70, 80, 90, 100],
+                    'n_estimators': [50, 60, 70, 80, 90, 100, 150, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000],
                     'max_depth': [3, 4, 5, 6, 7, 8, 9, 10],
                     'subsample': [0.7, 0.8, 0.9],
                     'colsample_bytree': [0.5, 0.6, 0.7, 0.8, 0.9, 1],  # 0.5 - 1
