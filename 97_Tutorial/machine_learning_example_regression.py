@@ -19,15 +19,19 @@ print("""\
 # load training data
 df_base = pd.read_csv("C:/Users/jason/PycharmProjects/Python/MyData/OnlineNewsPopularity.csv", header=0)
 df_base = df_base.drop(['url'], axis=1)
+df_base.rename(columns={'shares': 'response'}, inplace=True)
 
 print(df_base.head(10))
 
+
+"""
 data_explore_num(df_base) # no missing value, no character variables
 
 # create in-time training and validation sample
 df_train, df_valid, df_holdout = my_dataframe_split(df_base, frac_train=0.3, frac_valid=0.3, random_state=1)
 
-"""
+
+
 
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 # Step 2: model development and validation
@@ -35,9 +39,12 @@ df_train, df_valid, df_holdout = my_dataframe_split(df_base, frac_train=0.3, fra
 # params = {'n_estimators': [30]}
 
 # train model
-new_model = MLClassifier(estimator='XGBClassifier',  mode='default', df_train=df_train, df_valid=df_valid, str_resp='response')
+new_model = MLRegressor(estimator='GradientBoostingRegressor',  mode='default', df_train=df_train, df_valid=df_valid, str_resp='response')
 
-new_model.training()
+p_valid = new_model.training()
+
+print(p_valid.head(10))
+
 
 # best model
 print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")

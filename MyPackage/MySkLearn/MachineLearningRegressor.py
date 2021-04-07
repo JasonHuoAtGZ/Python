@@ -1,8 +1,8 @@
-"""Machine learning classifier
+"""Machine learning regressor
 - it incorporates
-    - XGBClassifier
-    - GradientBoostingClassifier
-    - RandomForestClassifier
+    - XGBRegressor
+    - GradientBoostingRegressor
+    - RandomForestRegressor
 - it creates C-stat, Maximum KS & decile lift measurements which are the most important statistics to validate model
 prediction for campaign targeting / order ranking.
 - developed by Jason Huo
@@ -12,9 +12,10 @@ prediction for campaign targeting / order ranking.
 import pandas as pd
 import time
 import itertools
-from sklearn.ensemble import GradientBoostingClassifier
-from sklearn.ensemble import RandomForestClassifier
-from xgboost import XGBClassifier
+from sklearn.ensemble import GradientBoostingRegressor
+from sklearn.ensemble import RandomForestRegressor
+from xgboost import XGBRegressor
+from sklearn.metrics import mean_squared_error
 from MyPackage.MyToolKit.MLMeasurement import decile_lift
 from MyPackage.MyToolKit.MLMeasurement import maximum_ks
 from MyPackage.MyToolKit.MLMeasurement import c_stat
@@ -39,80 +40,68 @@ class MLRegressor:
 
         if hyper_param_in is not None:
             self.hyper_param = hyper_param_in
-        elif self.estimator == 'GradientBoostingClassifier': # Gradient Boosting hyper parameters
+        elif self.estimator == 'GradientBoostingRegressor': # Gradient Boosting hyper parameters
             if self.mode is None or self.mode == 'default':
                 self.hyper_param = {
                     'n_estimators': [70],
-                    'learning_rate': [0.1],
-                    'min_samples_split': [50],
-                    'min_samples_leaf': [25],
                     'max_depth': [3],
-                    'max_features': ['sqrt'],
                     'subsample': [0.9],
+                    'colsample_bytree': [0.5],  # 0.5 - 1
+                    'learning_rate': [0.1],
                     'random_state': [10],
-                    'criterion': ['friedman_mse']
+                    'booster': ['gbtree']
                 }
             elif self.mode == 'superfast':
                 self.hyper_param = {
                     'n_estimators': [70],
-                    'learning_rate': [0.1],
-                    'min_samples_split': [50, 100],
-                    'min_samples_leaf': [25, 50],
                     'max_depth': [3, 4, 5, 6],
-                    'max_features': ['sqrt'],
                     'subsample': [0.9],
+                    'colsample_bytree': [0.5],  # 0.5 - 1
+                    'learning_rate': [0.1],
                     'random_state': [10],
-                    'criterion': ['friedman_mse']
+                    'booster': ['gbtree']
                 }
             elif self.mode == 'fast':
                 self.hyper_param = {
                     'n_estimators': [70, 80, 90],
+                    'max_depth': [3, 4, 5, 6],
+                    'subsample': [0.9],
+                    'colsample_bytree': [0.5],  # 0.5 - 1
                     'learning_rate': [0.1, 0.2],
-                    'min_samples_split': [50, 100, 200],
-                    'min_samples_leaf': [25, 50, 100],
-                    'max_depth': [3, 4, 5, 6],
-                    'max_features': ['sqrt'],
-                    'subsample': [0.9],
                     'random_state': [10],
-                    'criterion': ['friedman_mse']
+                    'booster': ['gbtree']
                 }
             elif self.mode == 'medium':
                 self.hyper_param = {
                     'n_estimators': [70, 80, 90, 100],
-                    'learning_rate': [0.1, 0.2, 0.3],
-                    'min_samples_split': [50, 100, 200, 500],
-                    'min_samples_leaf': [25, 50, 100, 250],
                     'max_depth': [3, 4, 5, 6, 7, 8],
-                    'max_features': ['sqrt'],
                     'subsample': [0.9],
+                    'colsample_bytree': [0.5],  # 0.5 - 1
+                    'learning_rate': [0.1, 0.2, 0.3],
                     'random_state': [10],
-                    'criterion': ['friedman_mse']
+                    'booster': ['gbtree']
                 }
             elif self.mode == 'slow':
                 self.hyper_param = {
                     'n_estimators': [50, 60, 70, 80, 90, 100],
-                    'learning_rate': [0.1, 0.2, 0.3, 0.4, 0.5],
-                    'min_samples_split': [50, 100, 200, 500, 1000],
-                    'min_samples_leaf': [25, 50, 100, 250, 500],
                     'max_depth': [3, 4, 5, 6, 7, 8, 9, 10],
-                    'max_features': ['sqrt'],
                     'subsample': [0.8, 0.9],
+                    'colsample_bytree': [0.5, 0.6, 0.7],  # 0.5 - 1
+                    'learning_rate': [0.1, 0.2, 0.3, 0.4, 0.5],
                     'random_state': [10],
-                    'criterion': ['friedman_mse']
+                    'booster': ['gbtree']
                 }
             elif self.mode == 'superslow':
                 self.hyper_param = {
                     'n_estimators': [50, 60, 70, 80, 90, 100],
-                    'learning_rate': [0.0001, 0.001, 0.01, 0.1, 0.2, 0.3, 0.4, 0.5],
-                    'min_samples_split': [50, 100, 200, 500, 1000],
-                    'min_samples_leaf': [25, 50, 100, 250, 500],
                     'max_depth': [3, 4, 5, 6, 7, 8, 9, 10],
-                    'max_features': ['sqrt'],
                     'subsample': [0.7, 0.8, 0.9],
+                    'colsample_bytree': [0.5, 0.6, 0.7, 0.8, 0.9, 1],  # 0.5 - 1
+                    'learning_rate': [0.0001, 0.001, 0.01, 0.1, 0.2, 0.3, 0.4, 0.5],
                     'random_state': [10],
-                    'criterion': ['friedman_mse']
+                    'booster': ['gbtree']
                 }
-        elif self.estimator == 'RandomForestClassifier': # Random Forest hyper parameters
+        elif self.estimator == 'RandomForestRegressor': # Random Forest hyper parameters
             if self.mode is None or self.mode == 'default':
                 self.hyper_param = {
                     'n_estimators': [70],
@@ -179,7 +168,7 @@ class MLRegressor:
                     'criterion': ['gini'],
                     'random_state': [10]
                 }
-        elif self.estimator == 'XGBClassifier': # Extreme Gradient Boosting hyper parameters
+        elif self.estimator == 'XGBRegressor': # Extreme Gradient Boosting hyper parameters
             if self.mode is None or self.mode == 'default':
                 self.hyper_param = {
                     'n_estimators': [70],
@@ -257,12 +246,12 @@ class MLRegressor:
             print("Response variable is not specified !")
 
     def estimator_constructor(self, str_estimator, dt_hyper_param):
-        if str_estimator == 'GradientBoostingClassifier':
-            return GradientBoostingClassifier(**dt_hyper_param)
-        elif str_estimator == 'RandomForestClassifier':
-            return RandomForestClassifier(**dt_hyper_param)
-        elif str_estimator == "XGBClassifier":
-            return  XGBClassifier(**dt_hyper_param)
+        if str_estimator == 'GradientBoostingRegressor':
+            return GradientBoostingRegressor(**dt_hyper_param)
+        elif str_estimator == 'RandomForestRegressor':
+            return RandomForestRegressor(**dt_hyper_param)
+        elif str_estimator == "XGBRegressor":
+            return XGBRegressor(**dt_hyper_param)
 
     def training(self):
         # Program start time
@@ -278,7 +267,6 @@ class MLRegressor:
         x_valid = self.df_valid.drop(self.str_resp, axis=1).values
 
         # grid search on given parameter mode
-
         # initiate the list to store parameter combination
         list_param = []
 
@@ -303,13 +291,13 @@ class MLRegressor:
                 df_param_temp = pd.concat([df_param_temp, pd.DataFrame([p[i]], columns=[item])], axis=1)
 
             # model training and fit
-            # clf = GradientBoostingClassifier(**hyper_param_single).fit(x_train, y_train)
             clf = self.estimator_constructor(self.estimator, hyper_param_single).fit(x_train, y_train)
 
             # model validation
-            p_predict = pd.DataFrame(clf.predict_proba(x_valid))
+            p_predict = pd.DataFrame(clf.predict(x_valid))
             p_actual = pd.DataFrame(self.df_valid[self.str_resp])
             p_valid = pd.concat([p_predict, p_actual], axis=1)
+            """
             p_valid.rename(columns={0: 'score_0', 1: 'score_1'}, inplace=True)
 
             p_rank = pd.DataFrame(pd.qcut(p_valid['score_1'], 10, labels=False, duplicates='drop'))
@@ -338,7 +326,6 @@ class MLRegressor:
         # save the best model
         best_param_temp = self.best_param[self.hyper_param.keys()]
         best_param_temp2 = best_param_temp.to_dict(orient="index")
-        # self.best_model = GradientBoostingClassifier(**best_param_temp2[0]).fit(x_train, y_train)
         self.best_model = self.estimator_constructor(self.estimator, best_param_temp2[0]).fit(x_train, y_train)
 
         # save the variable of importance for the best model
@@ -349,14 +336,16 @@ class MLRegressor:
             .reset_index(drop=True)
 
         print('Overall execution time in seconds: ' + str(time.time() - overall_start_time))
-        return
+        
+        """
+        return p_valid
 
     def validating_param(self, df_to_valid):
         # output validation results
         y_valid = df_to_valid[self.str_resp].values
         x_valid = df_to_valid.drop(self.str_resp, axis=1).values
 
-        p_predict = pd.DataFrame(self.best_model.predict_proba(x_valid))
+        p_predict = pd.DataFrame(self.best_model.predict(x_valid))
         p_actual = pd.DataFrame(df_to_valid[self.str_resp])
         p_valid = pd.concat([p_predict, p_actual], axis=1)
         p_valid.rename(columns={0: 'score_0', 1: 'score_1'}, inplace=True)
@@ -376,7 +365,7 @@ class MLRegressor:
         # output validation sample
         x_valid = df_to_valid.drop(self.str_resp, axis=1).values
 
-        p_predict = pd.DataFrame(self.best_model.predict_proba(x_valid))
+        p_predict = pd.DataFrame(self.best_model.predict(x_valid))
         p_actual = pd.DataFrame(df_to_valid[self.str_resp])
         p_valid = pd.concat([p_predict, p_actual], axis=1)
         p_valid.rename(columns={0: 'score_0', 1: 'score_1'}, inplace=True)
@@ -387,7 +376,7 @@ class MLRegressor:
         return p_valid2
 
     def scoring_out(self, df_to_score):
-        p_scored = pd.DataFrame(self.best_model.predict_proba(df_to_score.values))
+        p_scored = pd.DataFrame(self.best_model.predict(df_to_score.values))
         p_scored.rename(columns={0: 'score_0', 1: 'score_1'}, inplace=True)
 
         return p_scored
